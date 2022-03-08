@@ -1,0 +1,13 @@
+name: R-Bloggers-dashboard
+title: R-Bloggers-dashboard
+username:
+account: ettouilebouael
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5450278
+bundleId: 5473992
+url: https://ettouilebouael.shinyapps.io/R-Bloggers-Dashboard/
+when: 1642345901.2258
+lastSyncTime: 1642345901.22582
+asMultiple: FALSE
+asStatic: FALSE

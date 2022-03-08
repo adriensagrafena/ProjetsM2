@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Kmeans-spark:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Kmeans_spark_jar</output-path>
+    <root id="archive" name="Kmeans-spark.jar">
+      <element id="module-output" name="Kmeans-spark" />
+      <element id="file-copy" path="$PROJECT_DIR$/config.properties" />
+    </root>
+  </artifact>
+</component>

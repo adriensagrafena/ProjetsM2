@@ -1,0 +1,121 @@
+---
+documentclass: "compterendu"
+lang: true
+babel-lang: "french"
+geometry:
+  - left=1.5cm
+  - right=1.5cm
+  - top=1.5cm
+  - bottom=2cm
+title: "Un titre évocateur et relativement court pour le compte-rendu"
+author: 
+  - Premier AUTEUR
+  - Second AUTEUR
+email:
+  - premier.auteur@univ-reims.fr
+  - second.auteur@univ-reims.fr
+date: "`r format(Sys.time(), '%d %B %Y')`"
+abstract: "Un paragraphe présentant de façon synthétique le contenu du compte-rendu."
+anac: "2019-2020"
+diplome: "Licence Mathématiques Appliquées, 3\\up{ème} année"
+module: "MA0606"
+enseig: "Philippe Regnault"
+evaluation: "Compte-rendu d'analyse"
+output: 
+  bookdown::pdf_book:
+    template: template.tex
+    fig_caption: yes
+    keep_tex: yes
+    toc: yes
+bibliography: biblio_cr-urca.bib
+biblio-style: plain
+link-citations: yes
+---
+
+# Première partie
+
+```{r, echo = FALSE}
+#Ce bloc configure quelques options d'affichage pour les blocs R
+library('knitr')
+opts_chunk$set(comment = '', echo = FALSE,  tidy = TRUE, 
+               fig.pos = 'ht!', fig.align='center', fig.width= 4.5, fig.height = 3.2)
+```
+
+## Avec une première sous-partie
+
+Le corps du document est rédigé selon la syntaxe de _Markdown_. On peut mettre des expressions en _italique_ ou en __gras__, des blocs de code en ligne (non évalués) comme celui-ci `sample(1:49, 6)`, insérer des commentaires de base de page[^commentaire], des liens hypertexte comme [celui-là](http://univ-reims.fr), des expressions mathématiques du genre exprimées selon la syntaxe de \LaTeX du genre $\cos(\theta) ^2 + \sin(\theta)^2 = 1$, voire les centrer comme ceci :
+$$(a+b)^n = \sum_{k=0}^n {n \choose k} a^k b^{n-k}, \quad a,b \in \mathbb{C}, \quad n \in \mathbb{N}.$$
+
+[^commentaire]: Ceci est un commentaire de bas de page.
+
+## Puis une seconde
+
+On peut également insérer des blocs de code R dont le rendu est paramétrable. Par exemple, le bloc suivant est affiché sans être évalué
+```{r, echo = TRUE, eval = FALSE}
+sample(1:49, 6)
+```
+tandis que la sortie suivante est affichée sans que le code exécuté n'apparaisse :
+
+
+```{r, echo = FALSE, eval = TRUE}
+set.seed(7)
+options(width = 60)
+un_tableau <- table(sample(c("A", "B", "C"), 100, replace = TRUE), sample(1:4, 100, replace = TRUE))
+chisq.test(un_tableau)
+```
+
+
+On peut également insérer du code R en ligne, qui sera remplacé par le résultat de son évaluation dans le document généré, par exemple, le résultat de $3 \times 4$ vaut `r 3*4`.
+
+# Deuxième partie
+
+Le template `cr-urca` utilise le package `bookdown` apportant quelques fonctionnalités supplémentaires, dont la gestion des références croisées et des citations. La Figure \@ref(fig:dotplotex) donne un exemple de graphique accompagné de sa légende.
+
+(ref:capdotplotex) Un exemple de graphique produit par R, inséré et légendé grâce à _R Markdown_. S'il y a lieu, on précise la source des donnés, la cohorte et on explique comment lire le graphique.
+__Cohorte :__ on peut insérer du code R dans la légende : il y a `r length(seq(0, 1, by = 0.01))` points utilisé pour tracer ce graphique. 
+__Lecture :__ Débrouillez-vous.
+
+```{r dotplotex, fig.cap = "(ref:capdotplotex)"}
+plot(seq(0, 1, by = 0.01), seq(0, 1, by = 0.01)^2, type ='l') 
+```
+ 
+On peut faire de même pour les tableaux, comme illustré par la Table \@ref(tab:tableex) pour laquelle on a utilisé le package `kableExtra` pour modifier le style du tableau.
+ 
+(ref:captableex) Un exemple de tableau accompagné de sa légende.
+
+```{r tableex, message = FALSE}
+library('knitr')
+library('kableExtra')
+set.seed(3)
+un_tableau <- table(sample(c("A", "B", "C"), 100, replace = TRUE), sample(1:4, 100, replace = TRUE))
+kable(x = un_tableau, format = 'latex', caption = "(ref:captableex)", booktabs = TRUE) %>%
+  kable_styling(latex_options = c('striped')) %>%
+  row_spec(0, bold = TRUE)
+```
+
+Les équations mathématiques centrées et numérotées peuvent également être référencées, comme l'équation \@ref(eq:equationex).
+
+\begin{equation}
+ \mathbb{H}(p_1, \dots, p_n) = \sum_{i=1}^n p_i \log p_i, \quad p_i \geq 0, i = 1, \dots, n \textrm{ and }  \sum_{i=1}^n p_i =1.
+ (\#eq:equationex)
+\end{equation}
+
+De même, on peut faire référence aux théorèmes, propositions ou définitions que l'on déclare préalablement. Par exemple, le Théorème \@ref(thm:theoex).
+
+```{theorem, theoex, name="Pythagorean theorem", echo=TRUE}
+For a right triangle, if $c$ denotes the length of the hypotenuse
+and $a$ and $b$ denote the lengths of the other two sides, we have
+
+$$a^2 + b^2 = c^2.$$
+```
+
+
+Pour citer un article, un ouvrage, une page web, etc, on remplit préalablement le fichier `biblio_cr-urca.bib` en déclarant les références dans la syntaxe de _Bibtex_ puis on insère la citation. Pour plus d'information sur le fonctionnement de _R Markodown_, on pourra consulter [@rmarkdown_refbook2018].
+
+# (APPENDIX) Annexes {-}
+
+# Annexes
+
+On peut également ajouter une ou des partie(s) annexe(s) au document, permettant par exemple de détailler les procédures statistiques employées.
+
+# Bibliographie

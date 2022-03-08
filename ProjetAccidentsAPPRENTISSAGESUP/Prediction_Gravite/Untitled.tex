@@ -1,0 +1,634 @@
+\documentclass[french,]{tp}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[left=1.5cm,right=1.5cm,top=1.5cm,bottom=2cm]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Prédiction de la gravité des accidents corporels routiers},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[shorthands=off,main=french]{babel}
+\else
+  \usepackage{polyglossia}
+  \setmainlanguage[]{}
+\fi
+% An attempt to fix compatibility issue with pandoc >= 2.8
+% BEGIN
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[3] % #1 hanging-ident, #2 entry spacing
+ {% don't indent paragraphs
+  \setlength{\parindent}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1 \everypar{\setlength{\hangindent}{\cslhangindent}}\ignorespaces\fi
+  % set entry spacing
+  \ifnum #2 > 0
+  \setlength{\parskip}{#2\baselineskip}
+  \fi
+ }%
+ {}
+\usepackage{calc} % for \widthof, \maxof
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\maxof{\widthof{#1}}{\csllabelwidth}}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth}{#1}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+% END
+\usepackage{longtable,booktabs}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+
+
+%Mise en page
+%\usepackage[left=1.5cm,right=1.5cm,top=1.5cm,bottom=2cm]{geometry}
+\usepackage{lastpage} %Pour numérotaion des pages
+\usepackage{eso-pic} %pour l'image de fond de la page de garde
+\usepackage{enumitem} %Pour personnaliser les listes à puces
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+
+%Gestion des tableaux
+\usepackage{multirow}
+
+%Divers
+\usepackage{ifthen} %Gestion des instructions conditionnelles
+
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Configuration des messages de type badbox %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Definition environemments %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Désignation des variables de la classe %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  \title{Prédiction de la gravité des accidents corporels routiers}
+    \author{}
+      \date{23 janvier 2022}
+
+%\email{}
+\logouniv{logo_URCA.pdf}
+\date{23 janvier 2022}
+\diplome{Master Statistique pour l'Évaluation et la Prévision, 2\up{ème} année}
+\anac{2021 - 2022}
+\moduleref{SEP0932 - SEP0953}
+\modulenom{Amor KEZIOU - Morgan KESIOU}
+  \enseig{Hugo CARLIN, Valentine CROIBIEN, Emilie PIERQUIN, Adrien SAGRAFENA}
+%\evaluation{}
+
+
+%%%%%%%%%%%%%%%%%%%
+%% Mise en forme %%
+%%%%%%%%%%%%%%%%%%%
+
+
+%Formatage en-têtes et pieds de pages
+\pagestyle{fancy}
+\fancyhead[L]{\small \thetitle}
+\fancyhead[R]{\small \rightmark}
+\fancyfoot[l]{\small \themoduleref}
+\fancyfoot[C]{\small \it  }
+\fancyfoot[R]{\small \thepage\ / \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields
+\fancyfoot[C]{\small \thepage\ / \pageref{LastPage}} % except the center
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}}
+
+\AtEndDocument{\thispagestyle{plain}}
+% Pandoc header
+
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% Début du document %%
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\AddToShipoutPictureBG*{\includegraphics[width=\paperwidth,height=\paperheight]{FondURCA.png}}
+
+\thispagestyle{plain}
+\maketitle
+
+% \pagebreak
+
+\begin{abstract}
+Dans ce compte-rendu, vous trouverez une étude sur les accidents corporels routiers de 2019 en France.
+Nous avons réaliser une étude descriptive des usagers impliqués dans ces accidents ainsi que la création d'un modèle de prédiction de la gravité de ces accidents.
+\end{abstract}
+
+
+
+{
+\hypersetup{linkcolor=black}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+
+
+
+\newpage
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+Enjeux majeurs des décisions politiques, les problèmes liés à la sécurité routière sont au cœur de tous les débats depuis maintenant quatre décennies.
+Grâce aux innovations dans la conception et l'utilisation des voitures\footnote{On citera la ceinture de sécurité, les airbags, les renforts latéraux parmi tant d'autres.}, couplées à de nombreuses mesures de sécurité\footnote{On citera l'abaissement drastique du taux d'alcoolémie, l'instauration du permis à points, l'alourdissement du régime des contraventions, la politique de généralisations des radars et l'abaissement de la vitesse de 90 à 80km/h sur le réseau secondaire.}, d'incontestables résultats ont été obtenus pour limiter le nombre et l'impact des accidents routiers dans notre vie quotidienne. Ainsi, par exemple, le nombre de tués sur la route est passé de 12510 en 1980 à 3480 en 2019\footnote{\href{http://www.securite-routiere.org/Fiches/statistiques/statfr.htm}{Statistiques de la sécurité routière}}. Toutefois, ces mesures montrent leur limite en termes d'efficacité : le nombre de tués se stabilise par exemple autour de 3400/3500.
+
+\hypertarget{uxe9tudes-des-accidents-corporels-routiers-de-2019-en-france}{%
+\section{Études des accidents corporels routiers de 2019 en France}\label{uxe9tudes-des-accidents-corporels-routiers-de-2019-en-france}}
+
+\hypertarget{pruxe9diction-de-la-gravituxe9-des-accidents-corporels-routiers}{%
+\section{Prédiction de la gravité des accidents corporels routiers}\label{pruxe9diction-de-la-gravituxe9-des-accidents-corporels-routiers}}
+
+\newpage
+
+\hypertarget{conclusion}{%
+\section{Conclusion}\label{conclusion}}
+
+\newpage
+
+\hypertarget{appendix-annexes}{%
+\appendix}
+
+
+\hypertarget{annexes}{%
+\section{Annexes}\label{annexes}}
+
+\hypertarget{jeux-de-donnuxe9es-utilisuxe9s}{%
+\subsection{Jeux de données utilisés}\label{jeux-de-donnuxe9es-utilisuxe9s}}
+
+Les jeux de données utilisés sont disponibles sur \href{https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2019/}{DataGouv}. Ces jeux de données décrivent les accidents corporels routiers ayant eu lieu en 2019.
+
+Nous disposons de quatre bases de données :\\
+* Base caractéristiques : correspondant aux caractéristiques de l'accident\\
+* Base lieux : correspondant aux caractéristiques du lieu de l'accident\\
+* Base véhicule : correspondant aux caractéristiques du véhicule prenant part à l'accident\\
+* Base usagers : correspondant aux caractéristiques des usagers faisant partie de l'accident
+
+\hypertarget{pruxe9paration-des-donnuxe9es}{%
+\subsection{Préparation des données}\label{pruxe9paration-des-donnuxe9es}}
+
+\hypertarget{jointure-des-4-bases}{%
+\subsubsection{Jointure des 4 bases}\label{jointure-des-4-bases}}
+
+Nous réalisons des jointures entre les différentes bases sur l'identifiant de l'accident mais également sur l'identifiant des véhicules impliqués. Nous n'avons finalement plus qu'un jeu de données à étudier dans lequel chaque ligne correspond à un usager impliqué dans un accident corporel routier en France en 2019.
+
+\hypertarget{choix-des-variables}{%
+\subsubsection{Choix des variables}\label{choix-des-variables}}
+
+Cependant, en réalisant notre jointure, nous obtenons une base de données avec une multitude de variables (près d'une 60aine de variables).\\
+Nous choisissons donc de réaliser un premier tri sur ces variables et de garder les variables suivantes :
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Base caractéristiques} :
+
+  \begin{itemize}
+  \item
+    Num\_acc : Numéro d'identifiant de l'accident
+  \item
+    Jour mois : Jour et mois de l'accident
+  \item
+    Hrmn : Heures et minutes de l'accident
+  \item
+    Lum : Conditions d'éclairage dans lesquelles l'accident s'est produit\\
+    1 -- Plein jour\\
+    2 -- Crépuscule ou aube\\
+    3 -- Nuit sans éclairage public\\
+    4 -- Nuit avec éclairage public non allumé\\
+    5 -- Nuit avec éclairage public allumé
+  \item
+    Com : Le numéro de commune est un code donné par l`INSEE. Le code est composé du code INSEE du département suivi par 3 chiffres
+  \item
+    Agg : Localisation de l'accident\\
+    1 -- Hors agglomération\\
+    2 -- En agglomération
+  \item
+    Int : Le type d'intersection où l'accident s'est déroulé\\
+    1 -- Hors intersection\\
+    2 -- Intersection en X\\
+    3 -- Intersection en T\\
+    4 -- Intersection en Y\\
+    5 -- Intersection à plus de 4 branches\\
+    6 -- Giratoire\\
+    7 -- Place\\
+    8 -- Passage à niveau\\
+    9 -- Autre intersection
+  \item
+    Atm : Le type de condition atmosphérique\\
+    -1 -- Non renseigné\\
+    1 -- Normale\\
+    2 -- Pluie légère\\
+    3 -- Pluie forte\\
+    4 -- Neige - Grêle\\
+    5 -- Brouillard - Fumée\\
+    6 -- Vent fort - Tempête\\
+    7 -- Temps éblouissant\\
+    8 -- Temps couvert\\
+    9 -- Couvert
+  \item
+    Col : Le type de collision\\
+    -1 -- Non renseigné
+    1 -- Deux véhicules - frontale\\
+    2 -- Deux véhicules - par l'arrière\\
+    3 -- Deux véhicules - par le côté\\
+    4 -- Trois véhicules et plus - en chaîne\\
+    5 -- Trois véhicules et plus - collisions multiples\\
+    6 -- Autre collision\\
+    7 -- Sans collision
+  \end{itemize}
+\item
+  \textbf{Base lieux} :
+
+  \begin{itemize}
+  \item
+    Catr : Catégorie de route\\
+    1 -- Autoroute\\
+    2 -- Route nationale\\
+    3 -- Route départementale\\
+    4 -- Voie communale\\
+    5 -- Hors réseau public\\
+    6 -- Parc de stationnement ouvert à la circulation publique\\
+    7 -- Routes de métropole urbaine\\
+    9 -- Autre
+  \item
+    Voie : Numéro de la route
+  \item
+    Circ : Régime de circulation\\
+    -1 -- Non renseigné\\
+    1 -- À sens unique\\
+    2 -- Bidirectionnelle\\
+    3 -- À chaussées séparées\\
+    4 -- Avec voies d'affectation variable
+  \item
+    Nbv : Nombre total de voies de circulation
+  \item
+    Vosp : Signale l'existence d'une voie réservée, indépendamment du fait que l'accident ait lieu ou non sur cette voie\\
+    -1 -- Non renseigné\\
+    0 -- Sans objet\\
+    1 -- Piste cyclable\\
+    2 -- Bande cyclable\\
+    3 -- Voie réservée
+  \item
+    Prof : Profil en long décrit la déclivité de la route à l'endroit de l'accident\\
+    -1 -- Non renseigné\\
+    1 -- Plat\\
+    2 -- Pente\\
+    3 -- Sommet de côte\\
+    4 -- Bas de côte
+  \item
+    Plan : Tracé en plan\\
+    -1 -- Non renseigné\\
+    1 -- Partie rectiligne\\
+    2 -- En courbe à gauche\\
+    3 -- En courbe à droite\\
+    4 -- En ``s''
+  \item
+    Larrout : Largeur de la chaussée affectée à la circulation des véhicules, ne sont pas compris les bandes d'arrêts d'urgences, les TPC et les places de stationnement (en m)
+  \item
+    Surf : État de la surface\\
+    -1 -- Non renseigné\\
+    1 -- Normale\\
+    2 -- Mouillée\\
+    3 -- Flaques\\
+    4 -- Inondée\\
+    5 -- Enneigée\\
+    6 -- Boue\\
+    7 -- Verglacée\\
+    8 -- Corps gras - huile\\
+    9 -- Autre
+  \item
+    Infra : Aménagement, infrastructure\\
+    -1 -- Non renseigné\\
+    0 -- Aucun\\
+    1 -- Souterrain - tunnel\\
+    2 -- Pont - autopont\\
+    3 -- Bretelle d'échangeru ou de raccordement\\
+    4 -- Voie ferrée\\
+    5 -- Carrefour aménagé\\
+    6 -- Zone piétonne\\
+    7 -- Zone de péage\\
+    8 -- Chantier\\
+    9 -- Autres
+  \item
+    Situ : Situation de l'accident\\
+    -1 -- Non renseigné\\
+    0 -- Aucun\\
+    1 -- Sur chaussée\\
+    2 -- Sur bandes d'arrêt d'urgence\\
+    3 -- Sur accotement\\
+    4 -- Sur trottoir\\
+    5 -- Sur piste cyclable\\
+    6 -- Sur autre voie spéciale\\
+    8 -- Autres
+  \item
+    VMA : Vitesse maximale autorisée sur le lieu et au moment de l'accident
+  \end{itemize}
+\item
+  \textbf{Base véhicule} :
+
+  \begin{itemize}
+  \item
+    Id\_vehicule : Identifiant unique du véhicule repris pour chacun des usagers occupant ce véhicule (y compris les piétons qui sont rattachés aux véhicules qui les ont heurtés) -- Code numérique
+  \item
+    Catv : Catégorie du véhicule :
+    00 -- Indéterminable\\
+    01 -- Bicyclette\\
+    02 -- Cyclomoteur \textless50cm3\\
+    03 -- Voiturette (Quadricycle à moteur carrossé) (anciennement ``voiturette ou tricycle à moteur'')\\
+    04 -- Référence inutilisée depuis 2006 (scooter immatriculé)\\
+    05 -- Référence inutilisée depuis 2006 (motocyclette)\\
+    06 -- Référence inutilisée depuis 2006 (side-car)\\
+    07 -- VL seul\\
+    08 -- Référence inutilisée depuis 2006 (VL + caravane)\\
+    09 -- Référence inutilisée depuis 2006 (VL + remorque)\\
+    10 -- VU seul 1,5T \textless= PTAC \textless= 3,5T avec ou sans remorque (anciennement VU seul 1,5T \textless= PTAC
+    \textless= 3,5T)\\
+    11 -- Référence inutilisée depuis 2006 (VU (10) + caravane)\\
+    12 -- Référence inutilisée depuis 2006 (VU (10) + remorque)\\
+    13 -- PL seul 3,5T \textless PTCA \textless= 7,5T\\
+    14 -- PL seul \textgreater{} 7,5T\\
+    15 -- PL \textgreater{} 3,5T + remorque\\
+    16 -- Tracteur routier seul\\
+    17 -- Tracteur routier + semi-remorque\\
+    18 -- Référence inutilisée depuis 2006 (transport en commun)\\
+    19 -- Référence inutilisée depuis 2006 (tramway)\\
+    20 -- Engin spécial\\
+    21 -- Tracteur agricole\\
+    30 -- Scooter \textless{} 50 cm3\\
+    31 -- Motocyclette \textgreater{} 50 cm3 et \textless= 125 cm3\\
+    32 -- Scooter \textgreater{} 50 cm3 et \textless= 125 cm3\\
+    33 -- Motocyclette \textgreater{} 125 cm3\\
+    34 -- Scooter \textgreater{} 125 cm3\\
+    35 -- Quad léger \textless= 50 cm3 (Quadricycle à moteur non carrossé)\\
+    36 -- Quad lourd \textgreater{} 50 cm3 (Quadricycle à moteur non carrossé)\\
+    37 -- Autobus\\
+    38 -- Autocar\\
+    39 -- Train\\
+    40 -- Tramway\\
+    41 -- 3RM \textless= 50 cm3\\
+    42 -- 3RM \textgreater{} 50 cm3 \textless= 125 cm3\\
+    43 -- 3RM \textgreater{} 125 cm3\\
+    50 -- EDP à moteur\\
+    60 -- EDP sans moteur 80 -- VAE\\
+    99 -- Autre véhicule
+  \item
+    Obs : Obstacle fixe heurté\\
+    -1 -- Non renseigné\\
+    0 -- Sans objet\\
+    1 -- Véhicule en stationnement\\
+    2 -- Arbre\\
+    3 -- Glissière métallique\\
+    4 -- Glissière béton\\
+    5 -- Autre glissière\\
+    6 -- Bâtiment, mur, pile de pont\\
+    7 -- Support de signalisation verticale ou poste d'appel d'urgence\\
+    8 -- Poteau\\
+    9 -- Mobilier urbain\\
+    10 -- Parapet\\
+    11 -- Ilot, refuge, borne haute\\
+    12 -- Bordure de trottoir\\
+    13 -- Fossé, talus, paroi rocheuse\\
+    14 -- Autre obstacle fixe sur chaussée\\
+    15 -- Autre obstacle fixe sur trottoir ou accotement\\
+    16 -- Sortie de chaussée sans obstacle\\
+    17 -- Buse -- tête d'aqueduc
+  \item
+    Obsm : Obstacle mobile heurté\\
+    -1 -- Non renseigné\\
+    0 -- Aucun\\
+    1 -- Piéton\\
+    2 -- Véhicule\\
+    4 -- Véhicule sur rail\\
+    5 -- Animal domestique\\
+    6 -- Animal sauvage\\
+    9 -- Autre
+  \item
+    Manv : Manoeuvre principale avant l'accident\\
+    -1 -- Non renseigné\\
+    0 -- Inconnue\\
+    1 -- Sans changement de direction\\
+    2 -- Même sens, même file\\
+    3 -- Entre 2 files\\
+    4 -- En marche arrière\\
+    5 -- A contresens\\
+    6 -- En franchissant le terre-plein central\\
+    7 -- Dans le couloir bus, dans le même sens\\
+    8 -- Dans le couloir bus, dans le sens inverse\\
+    9 -- En s'insérant
+    10 -- En faisant demi-tour sur la chaussée\\
+    \textbf{Changeant de file}\\
+    11 -- A gauche\\
+    12 -- A droite\\
+    \textbf{Déporté}\\
+    13 -- A gauche\\
+    14 -- A droite\\
+    \textbf{Tournant}\\
+    15 -- A gauche\\
+    16 -- A droite\\
+    \textbf{Dépassant}\\
+    17 -- A gauche\\
+    18 -- A droite\\
+    \textbf{Divers}\\
+    19 -- Traversant la chaussée\\
+    20 -- Manœuvre de stationnement\\
+    21 -- Manœuvre d'évitement\\
+    22 -- Ouverture de porte\\
+    23 -- Arrêté (hors stationnement)\\
+    24 -- En stationnement (avec occupants)\\
+    25 -- Circulant sur trottoir\\
+    26 -- Autres manœuvres
+  \item
+    Motor : Type de motorisation du véhicule\\
+    -1 -- Non renseigné\\
+    0 -- Inconnue\\
+    1 -- Hydrocarbures\\
+    2 -- Hybride électrique\\
+    3 -- Electrique\\
+    4 -- Hydrogène\\
+    5 -- Humaine\\
+    6 -- Autre
+  \end{itemize}
+\item
+  \textbf{Base usagers} :
+
+  \begin{itemize}
+  \item
+    Catu : Catégorie d'usager\\
+    1 -- Conducteur\\
+    2 -- Passager\\
+    3 -- Piéton
+  \item
+    Grav: Gravité de blessure de l'usager, les usagers accidentés sont classés en trois catégories de victimes plus les indemnes\\
+    1 -- Indemne\\
+    2 -- Tué\\
+    3 -- Blessé hospitalisé\\
+    4 -- Blessé léger
+  \item
+    Sexe : Sexe de l'usager\\
+    1 -- Masculin\\
+    2 -- Féminin
+  \item
+    An\_nais : Année de naissance de l'usager
+  \item
+    Trajet : Motif du déplacement au moment de l'accident\\
+    -1 -- Non renseigné\\
+    0 -- Non renseigné\\
+    1 -- Domicile -- travail\\
+    2 -- Domicile -- école\\
+    3 -- Courses -- achats\\
+    4 -- Utilisation professionnelle\\
+    5 -- Promenade -- loisirs\\
+    9 -- Autre
+  \item
+    Secu1 :
+    Le renseignement du caractère indique la présence et l'utilisation de l'équipement de sécurité\\
+    -1 -- Non renseigné\\
+    0 -- Aucun équipement\\
+    1 -- Ceinture\\
+    2 -- Casque\\
+    3 -- Dispositif enfants\\
+    4 -- Gilet réfléchissant\\
+    5 -- Airbag (2RM/3RM)\\
+    6 -- Gants (2RM/3RM)\\
+    7 -- Gants + Airbag (2RM/3RM)\\
+    8 -- Non déterminable\\
+    9 -- Autre
+  \item
+    Secu2 : Le renseignement du caractère indique la présence et l'utilisation de l'équipement de sécurité\\
+    -1 -- Non renseigné\\
+    0 -- Aucun équipement\\
+    1 -- Ceinture\\
+    2 -- Casque\\
+    3 -- Dispositif enfants\\
+    4 -- Gilet réfléchissant\\
+    5 -- Airbag (2RM/3RM)\\
+    6 -- Gants (2RM/3RM)\\
+    7 -- Gants + Airbag (2RM/3RM)\\
+    8 -- Non déterminable\\
+    9 -- Autre
+  \item
+    Secu3 : Le renseignement du caractère indique la présence et l'utilisation de l'équipement de sécurité\\
+    -1 -- Non renseigné\\
+    0 -- Aucun équipement\\
+    1 -- Ceinture\\
+    2 -- Casque\\
+    3 -- Dispositif enfants\\
+    4 -- Gilet réfléchissant\\
+    5 -- Airbag (2RM/3RM)\\
+    6 -- Gants (2RM/3RM)\\
+    7 -- Gants + Airbag (2RM/3RM)\\
+    8 -- Non déterminable\\
+    9 -- Autre
+  \item
+    Locp : Localisation du piéton\\
+    -1 -- Non renseigné\\
+    0 -- Sans objet\\
+    \textbf{Sur chaussée :}\\
+    1 -- A + 50 m du passage piéton\\
+    2 -- A -- 50 m du passage piéton\\
+    \textbf{Sur passage piéton :}\\
+    3 -- Sans signalisation lumineuse\\
+    4 -- Avec signalisation lumineuse\\
+    \textbf{Divers :}\\
+    5 -- Sur trottoir\\
+    6 -- Sur accotement\\
+    7 -- Sur refuge ou BAU\\
+    8 -- Sur contre allée\\
+    9 -- Inconnue
+  \item
+    Actp : Action du piéton\\
+    -1 -- Non renseigné\\
+    \textbf{Se déplaçant}\\
+    0 -- Non renseigné ou sans objet\\
+    1 -- Sens véhicule heurtant\\
+    2 -- Sens inverse du véhicule\\
+    \textbf{Divers}\\
+    3 -- Traversant\\
+    4 -- Masqué\\
+    5 -- Jouant -- courant\\
+    6 -- Avec animal\\
+    9 -- Autre\\
+    A -- Monte/descend du véhicule\\
+    B -- Inconnue
+  \item
+    Etatp : Cette variable permet de préciser si le piéton accidenté était seul ou non\\
+    -1 -- Non renseigné\\
+    1 -- Seul\\
+    2 -- Accompagné\\
+    3 -- En groupe
+  \end{itemize}
+\end{itemize}
+
+% %
+% %
+% %
+%
+% 
+%
+% 
+
+\end{document}

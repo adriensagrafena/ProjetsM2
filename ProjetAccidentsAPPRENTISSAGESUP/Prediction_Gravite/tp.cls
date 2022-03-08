@@ -1,0 +1,136 @@
+\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+\ProvidesClass{tp}[2021/01/28 v0.1 Standard LaTeX document class]
+\LoadClass[a4paper, 11pt]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Définition des commandes propres à la classe %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\logouniv}[1]{\def\@logouniv{#1}}
+\newcommand{\logoufr}[1]{\def\@logoufr{#1}}
+\newcommand{\anac}[1]{\def\@anac{#1}}
+\newcommand{\theanac}{\@anac}
+\newcommand{\diplome}[1]{\def\@diplome{#1}}
+\newcommand{\thediplome}{\@diplome}
+\newcommand{\moduleref}[1]{\def\@moduleref{#1}}
+\newcommand{\themoduleref}{\@moduleref}
+\newcommand{\modulenom}[1]{\def\@modulenom{#1}}
+\newcommand{\themodulenom}{\@modulenom}
+\newcommand{\enseig}[1]{\def\@enseig{#1}}
+\newcommand{\theenseig}{\@enseig}
+%\newcommand{\evaluation}[1]{\def\@evaluation{#1}}
+%\newcommand{\theeval}{\@evaluation}
+\newcommand{\email}[1]{\def\@email{#1}}
+%\newcommand{\theauthor}{\@author}
+\newcommand{\thetitle}{\@title}
+\logouniv{}
+\anac{}
+\diplome{}
+\moduleref{}
+\modulenom{}
+\enseig{}
+%\evaluation{}
+
+%%
+%% Chargement de packages
+%%
+\RequirePackage{graphicx}
+\RequirePackage[table]{xcolor}
+\RequirePackage{hyperref}
+
+%%
+%% Définition des thèmes couleur %%
+%%
+
+%% Couleurs du logo URCA
+\definecolor{urcalightbrown}{RGB}{172,114, 50}
+\definecolor{urcabrown}{RGB}{75,0, 0}
+
+%% COuleurs UFR SEN
+\definecolor{senlightgreen}{RGB}{0,174,66}
+\definecolor{sendarkgreen}{RGB}{0,121, 52}
+\definecolor{senolive}{RGB}{118,188,33}
+
+%% Couleurs balises difficulté
+% \definecolor{basique}{RGB}{} % Chocolat
+% \definecolor{intermediaire}{RGB}{} % Bronze
+% \definecolor{confirme}{} % Argent
+% \definecolor{expert}{} % Or
+% \definecolor{gourou}{} % Cristal
+
+
+\renewcommand{\maketitle}{
+  \noindent
+  \begin{minipage}{\textwidth}
+    \begin{tabular}{@{}c@{}}
+      \includegraphics[width=3cm]{\@logouniv}
+    \end{tabular}%
+    \hfill%
+    \begin{tabular}{@{}c@{}}
+      {Ann\'ee universitaire \@anac} \\
+      {\@diplome} \\
+      {\@moduleref, \@modulenom} \\
+      { \@enseig}
+   \end{tabular}
+    \hfill
+  \end{minipage}
+%\par
+
+\noindent
+\hrulefill
+
+  \vskip 20\p@
+  \noindent
+  \begin{center}
+   {\bf \Large \@title}
+  \end{center}
+  \vskip 20\p@
+
+ % \vskip 20\p@
+
+  % \begin{center}%
+  %   {\LARGE \bf \textcolor{urcabrown}{ \@title} \par}%
+  %   \vskip 3em%
+  %   {\large
+  %    \lineskip .75em%
+  %     % \begin{tabular}[t]{c}%
+  %     %   \@author % \ -- \texttt{\@email}
+  %     % \end{tabular}\par}%
+  %      \begin{tabular}[t]{cc}
+  %       \begin{minipage}{0.45\textwidth}
+  %        \flushright
+  %        \@author
+  %       \end{minipage}
+  %       &
+  %      \begin{minipage}{0.45\textwidth}
+  %        \flushleft
+  %        \@email
+  %       \end{minipage}
+  %      \end{tabular}\par}
+  %     \vskip 20\p@%
+  %   {\large \@date \par}%       % Set date in \large size.
+  % \end{center}\par
+  % \vskip 20\p@
+  %
+  % \noindent
+  % \begin{tabular}{|@{}p{\textwidth}@{}|}
+  % \hline
+  % \hspace{\parindent}
+  % { \small Appr\'eciations et note du correcteur :} \\
+  %
+  % \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \hline
+  % \end{tabular}
+
+%  \global\let\thanks\relax
+%  \global\let\maketitle\relax
+%  \global\let\@maketitle\relax
+%  \global\let\@thanks\@empty
+%  \global\let\@author\@empty
+%  \global\let\@date\@empty
+%  \global\let\@title\@empty
+%  \global\let\title\relax
+%  \global\let\author\relax
+%  \global\let\date\relax
+%  \global\let\and\relax
+}
+

@@ -1,0 +1,1274 @@
+\documentclass[french,]{tp}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[left=1.5cm,right=1.5cm,top=1.5cm,bottom=2cm]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Prédiction de la gravité des accidents corporels routiers},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[shorthands=off,main=french]{babel}
+\else
+  \usepackage{polyglossia}
+  \setmainlanguage[]{}
+\fi
+% An attempt to fix compatibility issue with pandoc >= 2.8
+% BEGIN
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[3] % #1 hanging-ident, #2 entry spacing
+ {% don't indent paragraphs
+  \setlength{\parindent}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1 \everypar{\setlength{\hangindent}{\cslhangindent}}\ignorespaces\fi
+  % set entry spacing
+  \ifnum #2 > 0
+  \setlength{\parskip}{#2\baselineskip}
+  \fi
+ }%
+ {}
+\usepackage{calc} % for \widthof, \maxof
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\maxof{\widthof{#1}}{\csllabelwidth}}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth}{#1}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+% END
+\usepackage{longtable,booktabs}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+
+
+%Mise en page
+%\usepackage[left=1.5cm,right=1.5cm,top=1.5cm,bottom=2cm]{geometry}
+\usepackage{lastpage} %Pour numérotaion des pages
+\usepackage{eso-pic} %pour l'image de fond de la page de garde
+\usepackage{enumitem} %Pour personnaliser les listes à puces
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+
+%Gestion des tableaux
+\usepackage{multirow}
+
+%Divers
+\usepackage{ifthen} %Gestion des instructions conditionnelles
+
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Configuration des messages de type badbox %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Definition environemments %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Désignation des variables de la classe %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  \title{Prédiction de la gravité des accidents corporels routiers}
+    \author{}
+      \date{29 janvier 2022}
+
+%\email{}
+\logouniv{logo_URCA.pdf}
+\date{29 janvier 2022}
+\diplome{Master Statistique pour l'Évaluation et la Prévision, 2\up{ème} année}
+\anac{2021 - 2022}
+\moduleref{SEP0932 - SEP0953}
+\modulenom{Amor KEZIOU - Morgan COUSIN}
+  \enseig{Hugo CARLIN, Valentine CROIBIEN, Emilie PIERQUIN, Adrien SAGRAFENA}
+%\evaluation{}
+
+
+%%%%%%%%%%%%%%%%%%%
+%% Mise en forme %%
+%%%%%%%%%%%%%%%%%%%
+
+
+%Formatage en-têtes et pieds de pages
+\pagestyle{fancy}
+\fancyhead[L]{\small \thetitle}
+\fancyhead[R]{\small \rightmark}
+\fancyfoot[l]{\small \themoduleref}
+\fancyfoot[C]{\small \it  }
+\fancyfoot[R]{\small \thepage\ / \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields
+\fancyfoot[C]{\small \thepage\ / \pageref{LastPage}} % except the center
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}}
+
+\AtEndDocument{\thispagestyle{plain}}
+% Pandoc header
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% Début du document %%
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\AddToShipoutPictureBG*{\includegraphics[width=\paperwidth,height=\paperheight]{FondURCA.png}}
+
+\thispagestyle{plain}
+\maketitle
+
+% \pagebreak
+
+\begin{abstract}
+Dans ce compte-rendu, vous trouverez une étude sur les accidents corporels routiers de 2019 en France.
+Nous avons réalisé une étude descriptive des usagers impliqués dans ces accidents ainsi que la création d'un modèle de prédiction de la gravité de ces accidents.
+\end{abstract}
+
+
+
+{
+\hypersetup{linkcolor=black}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+
+
+
+\newpage
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+~~~~~~~~~~Enjeux majeurs des décisions politiques, les problèmes liés à la sécurité routière sont au cœur de tous les débats depuis maintenant quatre décennies.
+
+Grâce aux innovations dans la conception et l'utilisation des voitures\footnote{On citera la ceinture de sécurité, les airbags, les renforts latéraux parmi tant d'autres.}, couplées à de nombreuses mesures de sécurité\footnote{On citera l'abaissement drastique du taux d'alcoolémie, l'instauration du permis à points, l'alourdissement du régime des contraventions, la politique de généralisations des radars et l'abaissement de la vitesse de 90 à 80km/h sur le réseau secondaire.}, d'incontestables résultats ont été obtenus pour limiter le nombre et l'impact des accidents routiers dans notre vie quotidienne. Ainsi, par exemple, le nombre de tués sur la route est passé de 12510 en 1980 à 3480 en 2019\footnote{\href{http://www.securite-routiere.org/Fiches/statistiques/statfr.htm}{Statistiques de la sécurité routière}}. Toutefois, ces mesures montrent leur limite en termes d'efficacité : le nombre de tués se stabilise par exemple autour de 3400/3500.
+
+~~~~~~~~~~Notre étude porte sur les facteurs influençant la gravité des accidents corporels routiers. Nous allons essayer d'élaborer un modèle permettant de prédire la gravité d'un accident.
+
+Pour cela, nous avons choisi un ensemble de base de données issues du site \href{https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2019/}{DataGouv} sur les accidents corporels de la circulation routière de 2019. Les données utilisées sont présentées en annexe \ref{jeux-donnees}.
+
+~~~~~~~~~~Dans un premier temps, nous allons donc vous présenter une étude statistique des accidents corporels routiers en 2019, puis nous tenterons de mettre en place un modèle de prédiction de notre variable gravité.
+
+\newpage
+
+\hypertarget{uxe9tudes-des-accidents-corporels-routiers-de-2019-en-france}{%
+\section{Études des accidents corporels routiers de 2019 en France}\label{uxe9tudes-des-accidents-corporels-routiers-de-2019-en-france}}
+
+~~~~~~~~~~Dans un premier temps, nous avons étudié la répartition des usagers impliqués dans un accident corporel routier en 2019. Nous avons tout d'abord, étudié la répartition des usagers selon la gravité. Ensuite, nous avons étudié la répartition des usagers selon leur catégorie d'usagers. Puis, nous avons étudié la répartition des accidents sur l'année 2019. Cette répartition est visible dans la figure ci-dessous :
+
+
+
+
+
+
+\begin{figure}[ht!]
+
+{\centering \includegraphics{Prediction_Gravite_files/figure-latex/calendrier-1} 
+
+}
+
+\caption{Effectifs des accidents par jour sur l'année 2019\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 57855 accidents.\\
+\textbf{Lecture :} Il y a eu 252 accidents le 20 décembre 2019.}\label{fig:calendrier}
+\end{figure}
+
+~~~~~~Comme nous pouvons le constater sur la figure ci-dessus, les mois de juin, juillet, septembre et octobre sont ceux où il y a le plus d'accident. En regardant plus attentivement le calendrier, nous pouvons remarquer que ce sont les vendredis que nous retrouvons les plus grands nombres d'accidents et les dimanches que nous retrouvons les plus petits effectifs d'accidents. De plus, nous pouvons également remarquer qu'il y a peu d'accidents les jours fériés, par exemple le 8 mai, le 15 août ou encore le 11 novembre.
+
+~~~~~~De plus, nous remarquons dans un premier temps que la majorité des personnes impliquées dans un accident sont des conducteurs. Ce qui semble logique au vu de la définition même d'un accident corporel routier. En effet, pour être déterminé comme accident corporel de la circulation routière, il faut que l'accident soit relevé par les forces de l'ordre, qu'il implique au moins une victime, qu'il survienne sur une voie publique, privée, ou ouverte à la circulation publique et qu'il implique également au moins un véhicule. Dans un deuxième temps, nous constatons que les usagers ressortent majoritairement indemnes des accidents. Ensuite, nous remarquons que la plupart des accidents ont lieu lors des trajets \emph{Promenade, loisirs}.
+
+~~~~~~Nous étudions la répartition des usagers selon la gravité croisée avec d'autres variables telles que la catégorie de l'usager, le type de trajet effectué, l'état de la surface, les conditions atmosphériques, etc. Nous pouvons tirer de cette étude que, globalement, les usagers ressortaient indemnes ou légèrement blessés des accidents corporels routiers. Très peu d'usagers, moins de 5\%, étaient tués lors de l'accident. En croisant la gravité avec la catégorie de l'usager, nous remarquons que les usagers présents dans le véhicule sortent majoritairement indemnes ou légèrement blessés de l'accident. Contrairement aux idées reçues, il semblerait que la place du passager ne soit pas celle « du mort » puisque qu'il y a autant de tués dans cette catégorie que pour les conducteurs ou les piétons. De plus, les piétons sont, logiquement, plus rapidement grièvement blessés.
+
+~~~~~~Ensuite, lorsque nous croisons la gravité au type de trajet effectué, nous remarquons à nouveau que les usagers ressortent majoritairement indemnes ou légèrement blessés des accidents. Nous remarquons également que les types de trajets pour lesquels il y a le plus de tués sont les trajets promenade -- loisirs ou courses -- achats tandis et que le type de trajet pour lequel il y a le plus de personnes indemnes est celui de l'utilisation professionnelle.
+
+~~~~~~Après cela, en croisant la gravité aux types de conditions atmosphériques, nous constatons que la gravité de l'accident est plus élevée lorsque les conditions météorologiques sont extrêmes, par exemple lorsque qu'il y a du vent fort ou des tempêtes.
+
+~~~~~~Maintenant que nous avons une idée générale de la gravité des accidents corporels routiers de 2019, nous allons tenter de classifier les usagers par niveau de gravité et de créer un modèle de prédiction de la gravité.
+
+\hypertarget{pruxe9diction-de-la-gravituxe9-des-accidents-corporels-routiers}{%
+\section{Prédiction de la gravité des accidents corporels routiers}\label{pruxe9diction-de-la-gravituxe9-des-accidents-corporels-routiers}}
+
+Rappelons que l'objectif est de prédire la gravité des accidents de la route à l'aide de différentes variables relevées sur chaque accident ayant eu lieu en France en 2019. Grâce à ce modèle de prédiction recherché nous voulons prédire la gravité d'un accident en ayant connaissance des certains facteurs pour ainsi determiner ce qui influence cette gravité. Pour se faire nous avons determiné la gravité des dommages corporels des usagers impliqués dans l'accident sur une échelle entre 1 et 3 tel que :
+
+\begin{itemize}
+\tightlist
+\item
+  1 : l'usager est indemne\\
+\item
+  2 : l'usager est blessé leger\\
+\item
+  3 : l'usager est hospitalisé ou décédé
+\end{itemize}
+
+Le fait de regrouper ``blessé hospitalisé'' et ``décédé'' est volontaire dans le but de rendre le modèle optimal. La première chose à faire est de trouver quel modèle explique le mieux notre variable à prédire, c'est à dire quelles sont les variables, parmi toutes celles sélectionnées, à choisir pour obtenir les meilleurs résultats de prédiction.
+Nous avons également supprimé les variables du numéro de l'accident, de la commune et de la plaque d'immatriculation.
+
+La première approche retenue fut celle du modèle de régression logistique multinomiale. Cependant, la lourdeur de la base de données et la lenteur des calculs lors de nos premiers essais nous ont amenés à tester ce modèle sur un extrait des données, composé de 10 000 individus pris au hasard, en considérant l'ensemble de variables restantes. Le modèle de régression logistique sur ces individus en prenant en compte toutes les variables nous donne une précision de classement de 68\%.
+Nous cherchons alors quel serait dans ces conditions le modèle optimal pour cette sous-population.
+
+En utilisant le critère AIC, nous retenons alors les variables suivantes qui expliquent la gravité de l'accident pour notre modèle optimal sur 10 000 individus : \emph{catv, catu, obsm, agg, col, obs, catr, sexe, manv, trajet, circ, situ, nbv, vma}.
+
+Nous revenons ensuite à notre base de données initiale avec 130857 individus en conservant les variables susnommées pour construire notre modèle de régression logistique définitif. Après avoir utilisé une base d'apprentissage et de test (répartition 70\%-30\%) sur l'ensemble des individus, nous arrivons à une précision de classement de 66.4\%, légèrement supérieure aux modèles pré-existants sur nos données.
+
+Nous pouvons donc dire qu'avec une précision satisfaisante, la gravité d'un accident est expliquée avec une précision de 66,4\% dans le modèle de régression logistique par :
+
+\begin{itemize}
+\tightlist
+\item
+  le motif du déplacement au moment de l'accident (trajet) ;\\
+\item
+  la localisation de l'accident (agg) ;\\
+\item
+  le type de collision (col) ;\\
+\item
+  la catégorie de la route (catr);\\
+\item
+  le régime de circulation (circ) ;\\
+\item
+  le nombre de voies (nbv) ;\\
+\item
+  la vitesse maximale autorisée (vma) ;\\
+\item
+  la catégorie du véhicule (catv) ;\\
+\item
+  la présence d'un obstacle mobile (obsm) ;\\
+\item
+  la présence d'un obstacle fixe (obs) ;\\
+\item
+  la manœuvre principale effectuée avant l'accident (manv) ;\\
+\item
+  la catégorie d'usager (catu) ;\\
+\item
+  le sexe ;\\
+\item
+  la situation de l'accident (situ).
+\end{itemize}
+
+Avec l'objectif de trouver de meilleurs résultats que la régression logistique nous avons choisi deux méthodes de prédiction par arbres de décisions : la méthode XGBoost et RandomForest. Deux méthodes de classification supervisée faciles à mettre en place, prenant en compte les variables qualitatives, ce qui est notre cas. Sur l'ensemble des mêmes variables sélectionnées par la méthode AIC précédemment évoquée et la même division des bases train et test, nous obtenons une précision de classement de 65.1\% pour XGBoost et 67.8\% pour RandomForest.
+
+C'est donc la méthode RandomForest qui donne les meilleures prédictions et que nous retenons.
+
+\newpage
+
+\hypertarget{conclusion}{%
+\section{Conclusion}\label{conclusion}}
+
+~~~~~~Notre travail nous a amené à comprendre les facteurs qui influencent la gravité d'un accident. L'ampleur des données a nécessité un examen approfondi des bases utilisées, un nettoyage des données et des variables de façon à nous recentrer sur ce qui semblait être le plus pertinent. Il a fallu plusieurs fois revenir sur nos pas pour optimiser ce long travail sur une base de données particulièrement riche.
+
+Il a fallu également comprendre les interactions entre les différentes caractéristiques qui décrivent un accident. Cela nous a fréquemment amenés à interroger notre vision globale du sujet et à remettre en question les préjugés que l'on a parfois, comme le rôle de la place de la victime dans le véhicule ou celui de la météorologie par exemple.
+
+Enfin, l'utilisation des techniques d'apprentissage supervisé nous a permis de mettre en évidence une conjonction de facteurs qui expliquent de façon relativement efficace la gravité d'un accident. Là où nous attendions, peut-être de façon un peu naïve, la luminosité par exemple, nous avons mis en exergue d'autres facteurs : le type de collision ou le type de trajet effectué. Les autres facteurs mis au jour semblent plutôt de bon sens et sont d'ailleurs bien connus dans le monde de l'accidentologie et de l'assurance : le sexe et la présence d'obstacle pour ne citer qu'eux.
+
+~~~~~~D'autres pistes restent ouvertes pour améliorer les modèles construits afin de peut-être gagner en précision. Le regroupement des modalités parfois nombreuses au sein d'une même variable ou un traitement valorisé de l'information portée par la tranche horaire de l'accident mériteraient sans doute d'enrichir nos modèles, en dépit de la lourdeur calculatoire qui en résulterait. Un choix plus restreint dans le nombre d'individus accidentés sera sans doute à utiliser conjointement à cet effet.
+
+\newpage
+
+\hypertarget{appendix-annexes}{%
+\appendix}
+
+
+\hypertarget{annexes}{%
+\section{Annexes}\label{annexes}}
+
+\hypertarget{jeux-donnees}{%
+\subsection{Jeux de données utilisés}\label{jeux-donnees}}
+
+Les jeux de données utilisés sont disponibles sur \href{https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2019/}{DataGouv}. Ces jeux de données décrivent les accidents corporels routiers ayant eu lieu en 2019.
+
+Nous disposons de quatre bases de données :
+
+\begin{itemize}
+\tightlist
+\item
+  Base caractéristiques : correspondant aux caractéristiques générales de l'accident
+\item
+  Base lieux : correspondant aux caractéristiques du lieu de l'accident
+\item
+  Base véhicule : correspondant aux caractéristiques du véhicule prenant part à l'accident
+\item
+  Base usagers : correspondant aux caractéristiques des usagers faisant partie de l'accident
+\end{itemize}
+
+\hypertarget{prepa-donnees}{%
+\subsection{Préparation des données}\label{prepa-donnees}}
+
+\hypertarget{jointure-des-4-bases}{%
+\subsubsection{Jointure des 4 bases}\label{jointure-des-4-bases}}
+
+Nous réalisons des jointures entre les différentes bases sur l'identifiant de l'accident mais également sur l'identifiant des véhicules impliqués. Nous n'avons finalement plus qu'un jeu de données à étudier dans lequel chaque ligne correspond à un usager impliqué dans un accident corporel routier en France en 2019.
+
+\hypertarget{choix-des-variables}{%
+\subsubsection{Choix des variables}\label{choix-des-variables}}
+
+Cependant, en réalisant notre jointure, nous obtenons une base de données avec une soixantaine de variables.\\
+Nous choisissons donc de réaliser un premier tri sur ces variables et de garder les variables suivantes :
+
+\begin{itemize}
+\tightlist
+\item
+  L'identifiant de l'accident,
+\item
+  La date,
+\item
+  L'heure et minute,
+\item
+  La luminosité,
+\item
+  Le département,
+\item
+  La commune,
+\item
+  Si l'accident a eu lieu en agglomération ou non,
+\item
+  Le type d'intersection,
+\item
+  Les conditions atmosphériques,
+\item
+  Le type de collision,
+\item
+  La catégorie de la route,
+\item
+  Le régime de circulation,
+\item
+  Le nombre de voies,
+\item
+  La présence d'une voie particulière,
+\item
+  Le profil de la route,
+\item
+  Le plan de la route,
+\item
+  L'état de la surface,
+\item
+  Les infrastructures mises en place,
+\item
+  La situation de l'accident,
+\item
+  La vitesse maximale autorisée,
+\item
+  L'identifiant du véhicule,
+\item
+  La gravité,
+\item
+  La catégorie de l'usager,
+\item
+  Le sexe de l'usager,
+\item
+  Le type de trajet effectué,
+\item
+  La catégorie du véhicule,
+\item
+  L'obstacle fixe rencontré,
+\item
+  L'obstacle mobile rencontré,
+\item
+  Le type de manoeuvre effectué,
+\item
+  Le moteur du véhicule.
+\end{itemize}
+
+\hypertarget{statistiques-descriptives-sur-les-usagers}{%
+\subsection{Statistiques descriptives sur les usagers}\label{statistiques-descriptives-sur-les-usagers}}
+
+\hypertarget{stat-glob}{%
+\subsubsection{Statistiques globales}\label{stat-glob}}
+
+\hypertarget{ruxe9partition-des-usagers-par-gravituxe9}{%
+\paragraph{Répartition des usagers par gravité}\label{ruxe9partition-des-usagers-par-gravituxe9}}
+
+
+
+
+
+\begin{table}[H]
+
+\caption{\label{tab:tablegrav}Effectifs des usagers par gravité\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 130857 usagers.\\}
+\centering
+\begin{tabular}[t]{lr}
+\toprule
+\textbf{Var1} & \textbf{Freq}\\
+\midrule
+\cellcolor{gray!6}{Indemne} & \cellcolor{gray!6}{54529}\\
+Tué & 3413\\
+\cellcolor{gray!6}{Blessé hospitalisé} & \cellcolor{gray!6}{20329}\\
+Blessé léger & 52586\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Lecture :} 54529 usagers sont ressortis indemnes d'un accident routier.\\
+\textbf{Commentaire :} Dans notre jeu de données, les usagers tués lors de l'accident sont sous-représentés avec 3413 individus contre 54529 individus pour les usagers indemnes.
+
+\hypertarget{ruxe9partition-des-usagers-par-catuxe9gorie-dusagers}{%
+\paragraph{Répartition des usagers par catégorie d'usagers}\label{ruxe9partition-des-usagers-par-catuxe9gorie-dusagers}}
+
+
+
+
+
+\begin{table}[H]
+
+\caption{\label{tab:tablecatu}Effectifs des usagers par catégorie d'usagers\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 130857 usagers.\\}
+\centering
+\begin{tabular}[t]{lr}
+\toprule
+\textbf{Var1} & \textbf{Freq}\\
+\midrule
+\cellcolor{gray!6}{Conducteur} & \cellcolor{gray!6}{95854}\\
+Passager & 23956\\
+\cellcolor{gray!6}{Piéton} & \cellcolor{gray!6}{11047}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Lecture :} 95854 des usagers impliqués dans un accident routier sont conducteurs.\\
+\textbf{Commentaire :} La place d'usager la plus représentée est celle correspondant au conducteur avec 95854 usagers tandis que la place la moins représentée est celle des passagers avec 23956 usagers.
+
+\newpage
+
+\hypertarget{ruxe9partition-des-usagers-par-catuxe9gorie-trajet}{%
+\paragraph{Répartition des usagers par catégorie trajet}\label{ruxe9partition-des-usagers-par-catuxe9gorie-trajet}}
+
+
+
+
+
+\begin{table}[H]
+
+\caption{\label{tab:tabletrajet}Effectifs des usagers par type de trajet\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 130857 usagers.\\}
+\centering
+\begin{tabular}[t]{lr}
+\toprule
+\textbf{Var1} & \textbf{Freq}\\
+\midrule
+\cellcolor{gray!6}{Non renseigné} & \cellcolor{gray!6}{34322}\\
+Domicile - Travail & 17455\\
+\cellcolor{gray!6}{Domicile - École} & \cellcolor{gray!6}{2796}\\
+Courses - Achats & 3467\\
+\cellcolor{gray!6}{Utilisation professionnnelle} & \cellcolor{gray!6}{12359}\\
+\addlinespace
+Promenade - Loisirs & 51130\\
+\cellcolor{gray!6}{Autre} & \cellcolor{gray!6}{9328}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Lecture :} 17455 usagers sont impliqués dans un accident corporel routier lors du trajet Domicile - Travail.\\
+\textbf{Commentaire :} Selon ce tableau d'effectifs, nous remarquons que le type de trajet pour lequel il y a le plus d'usagers impliqués dans les accidents est celui correspondant aux promenades et loisirs tandis que le type de trajet pour lequel nous avons le plus petit effectif est celui correspondant aux trajets domicile -- école.
+
+\hypertarget{ruxe9partition-des-usagers-par-condition-atmosphuxe9rique}{%
+\paragraph{Répartition des usagers par condition atmosphérique}\label{ruxe9partition-des-usagers-par-condition-atmosphuxe9rique}}
+
+
+
+
+
+\begin{table}[H]
+
+\caption{\label{tab:tablecond}Effectifs des usagers par condition atmosphérique\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 130857 usagers.\\}
+\centering
+\begin{tabular}[t]{lr}
+\toprule
+\textbf{Var1} & \textbf{Freq}\\
+\midrule
+\cellcolor{gray!6}{Normale} & \cellcolor{gray!6}{103725}\\
+Pluie légère & 14493\\
+\cellcolor{gray!6}{Pluie forte} & \cellcolor{gray!6}{3183}\\
+Neige - grêle & 609\\
+\cellcolor{gray!6}{Brouillard - fumée} & \cellcolor{gray!6}{708}\\
+\addlinespace
+Vent fort - tempête & 358\\
+\cellcolor{gray!6}{Temps éblouissant} & \cellcolor{gray!6}{2288}\\
+Temps couvert & 4857\\
+\cellcolor{gray!6}{Autre} & \cellcolor{gray!6}{636}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Lecture :} 103725 usagers sont impliqués dans un accident corporel routier en condition atmosphérique normale.\\
+\textbf{Commentaire :} Selon ce tableau d'effectifs, nous remarquons que le type de condition atmosphérique pour lequel il y a le plus d'usagers impliqués dans les accidents est celui correspondant à la condition atmosphérique ``normale'' tandis que le type de condition atmosphérique pour lequel nous avons le plus petit effectif est celui correspondant à la condition ``Vent Fort - Tempête.''
+
+\newpage
+
+\hypertarget{ruxe9partition-des-usagers-par-surface}{%
+\paragraph{Répartition des usagers par surface}\label{ruxe9partition-des-usagers-par-surface}}
+
+
+
+
+
+\begin{table}[H]
+
+\caption{\label{tab:tablesurf}Effectifs des usagers par surface\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 130857 usagers.\\}
+\centering
+\begin{tabular}[t]{lr}
+\toprule
+\textbf{Var1} & \textbf{Freq}\\
+\midrule
+\cellcolor{gray!6}{Normale} & \cellcolor{gray!6}{104852}\\
+Mouillée & 24248\\
+\cellcolor{gray!6}{Flaques} & \cellcolor{gray!6}{228}\\
+Inondée & 47\\
+\cellcolor{gray!6}{Enneigée} & \cellcolor{gray!6}{251}\\
+\addlinespace
+Boue & 36\\
+\cellcolor{gray!6}{Verglacée} & \cellcolor{gray!6}{427}\\
+Corps gras ou huile & 194\\
+\cellcolor{gray!6}{Autre} & \cellcolor{gray!6}{574}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Lecture :} 104852 usagers sont impliqués dans un accident corporel routier sur surface normale.\\
+\textbf{Commentaire :} Selon ce tableau d'effectifs, nous remarquons que le type de surface pour lequel il y a le plus d'usagers impliqués dans les accidents est celui correspondant à la surface ``normale'' tandis que le type de surface pour lequel nous avons le plus petit effectif est celui correspondant à la surface ``Boue.''
+
+\newpage
+
+\hypertarget{ruxe9partition-des-usagers-par-catuxe9gorie-de-route}{%
+\paragraph{Répartition des usagers par catégorie de route}\label{ruxe9partition-des-usagers-par-catuxe9gorie-de-route}}
+
+
+
+
+
+\begin{table}[H]
+
+\caption{\label{tab:tablecatr}Effectifs des usagers par catégorie de route\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 130857 usagers.\\}
+\centering
+\begin{tabular}[t]{lr}
+\toprule
+\textbf{Var1} & \textbf{Freq}\\
+\midrule
+\cellcolor{gray!6}{Autoroute} & \cellcolor{gray!6}{15765}\\
+Nationale & 9416\\
+\cellcolor{gray!6}{Départementale} & \cellcolor{gray!6}{46099}\\
+Voie Communales & 54625\\
+\cellcolor{gray!6}{Hors réseau public} & \cellcolor{gray!6}{131}\\
+\addlinespace
+Parking & 815\\
+\cellcolor{gray!6}{Route metropole urbaine} & \cellcolor{gray!6}{2898}\\
+Autre & 1108\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Lecture :} 15765 usagers sont impliqués dans un accident corporel routier sur autoroute.\\
+\textbf{Commentaire :} Selon ce tableau d'effectifs, nous remarquons que la catégorie de route pour laquelle il y a le plus d'usagers impliqués dans les accidents est celui correspondant à la catégorie ``Voie communales'' tandis que la catégorie pour laquelle nous avons le plus petit effectif est celle correspondant à la catégorie ``Hors réseau public.''
+
+\newpage
+
+\hypertarget{crois-grav}{%
+\subsubsection{Croisement de la gravité avec d'autres variables}\label{crois-grav}}
+
+\hypertarget{ruxe9partition-des-usagers-selon-leur-catuxe9gorie-et-la-gravituxe9}{%
+\paragraph{Répartition des usagers selon leur catégorie et la gravité}\label{ruxe9partition-des-usagers-selon-leur-catuxe9gorie-et-la-gravituxe9}}
+
+
+
+
+
+
+
+\begin{figure}[ht!]
+
+{\centering \includegraphics{Prediction_Gravite_files/figure-latex/barplotcatu-1} 
+
+}
+
+\caption{Graphiques à bâtons sur les profils lignes, regroupement par catégorie d'usagers\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 130857 usagers.\\
+\textbf{Lecture :} 64\% des piétons sont des blessés légers.\\
+\textbf{Commentaire :} Globalement, les usagers sont répartis de la même manière selon la gravité pour chaque catégorie. Ils sortent majoritairement indemnes ou légèrement blessés. Seule la catégorie piétonne est plus fortement blessée puisqu'il y a très peu de personnes indemnes. Cette observation semble tout à fait logique.}\label{fig:barplotcatu}
+\end{figure}
+
+\newpage
+
+\hypertarget{ruxe9partition-des-usagers-selon-leur-trajet-et-la-gravituxe9}{%
+\paragraph{Répartition des usagers selon leur trajet et la gravité}\label{ruxe9partition-des-usagers-selon-leur-trajet-et-la-gravituxe9}}
+
+
+
+
+
+
+
+\begin{figure}[ht!]
+
+{\centering \includegraphics{Prediction_Gravite_files/figure-latex/barplottrajet-1} 
+
+}
+
+\caption{Graphiques à bâtons sur les profils lignes, regroupement par type de trajet\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 130857 usagers.\\
+\textbf{Lecture :} 65\% des usagers ayant un eu un accident lors d'un trajet d'utilisation professionnelle en ressortent indemnes.\\
+\textbf{Commentaire :} Globalement, les usagers sont répartis de la même manière selon la gravité pour chaque type de trajet, avec en majorité (environ 40\%) des usagers qui ressortent indemnes ou blessés légèrement de l'accident. Seuls les accidents ayant lieu lors d'un trajet de type utilisation professionnelle ont 65\% des usagers qui ressortent indemnes. Ce sont les trajets de type Courses -- achats ou Promenade -- loisirs qui possèdent le pourcentage le plus élevé d'usagers tués (5\%).}\label{fig:barplottrajet}
+\end{figure}
+
+\newpage
+
+\hypertarget{ruxe9partition-des-usagers-selon-la-condition-atmosphuxe9rique-et-la-gravituxe9}{%
+\paragraph{Répartition des usagers selon la condition atmosphérique et la gravité}\label{ruxe9partition-des-usagers-selon-la-condition-atmosphuxe9rique-et-la-gravituxe9}}
+
+
+
+
+
+
+
+\begin{figure}[ht!]
+
+{\centering \includegraphics{Prediction_Gravite_files/figure-latex/barplotatm-1} 
+
+}
+
+\caption{Graphiques à bâtons sur les profils lignes, regroupement par type de trajet\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 130857 usagers.\\
+\textbf{Lecture :} 42\% des usagers ayant un eu un accident alors que la condition atmosphérique était normale en ressortent indemnes.\\
+\textbf{Commentaire :} Globalement, les usagers sont répartis de la même manière selon la gravité pour chaque type de condition atmosphérique, avec en majorité des usagers qui ressortent indemnes ou blessés légèrement de l'accident. C'est lorsque nous avons des conditions atmosphériques extrêmes que nous avons des taux de tués ou blessés hospitalisés les plus élevés, par exemple lorsque qu'il y a du vent fort -- tempête avec 26\% de blessés hospitalisés et 7\% de tués.}\label{fig:barplotatm}
+\end{figure}
+
+\newpage
+
+\hypertarget{ruxe9partition-des-usagers-selon-la-catuxe9gorie-de-route-et-la-gravituxe9}{%
+\paragraph{Répartition des usagers selon la catégorie de route et la gravité}\label{ruxe9partition-des-usagers-selon-la-catuxe9gorie-de-route-et-la-gravituxe9}}
+
+
+
+
+
+
+
+\begin{figure}[ht!]
+
+{\centering \includegraphics{Prediction_Gravite_files/figure-latex/barplotroute-1} 
+
+}
+
+\caption{Graphiques à bâtons sur les profils lignes, regroupement par type de trajet\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 130857 usagers.\\
+\textbf{Lecture :} 46\% des usagers ayant un eu un accident sur autoroute en ressortent indemnes.\\
+\textbf{Commentaire :} Globalement, les usagers sont répartis de la même manière selon la gravité pour chaque type de route, avec en majorité des usagers qui ressortent indemnes ou blessés légèrement de l'accident. Ce sont sur les routes de types Départementales ou Hors réseau public que nous retrouvons le plus d'usagers blessés hospitalisés avec environ 25\% des usagers de ces deux catégories.}\label{fig:barplotroute}
+\end{figure}
+
+\newpage
+
+\hypertarget{ruxe9partition-des-usagers-selon-la-surface-et-la-gravituxe9}{%
+\paragraph{Répartition des usagers selon la surface et la gravité}\label{ruxe9partition-des-usagers-selon-la-surface-et-la-gravituxe9}}
+
+
+
+
+
+
+
+\begin{figure}[ht!]
+
+{\centering \includegraphics{Prediction_Gravite_files/figure-latex/barplotsurface-1} 
+
+}
+
+\caption{Graphiques à bâtons sur les profils lignes, regroupement par type de trajet\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Cohorte :} 130857 usagers.\\
+\textbf{Lecture :} 42\% des usagers ayant un eu un accident alors que la surface était normale en ressortent indemnes.\\
+\textbf{Commentaire :} Globalement, les usagers sont répartis de la même manière selon la gravité pour chaque type de surface, avec en majorité des usagers qui ressortent indemnes ou blessés légèrement de l'accident. Cependant, lorsque la surface est de la boue, la gravité de l'accident est plus importante. En effet, 40\% des usagers ayant eu un accident routier sur de la boue en ressortent blessés hospitalisés et 4\% en ressortent tués.}\label{fig:barplotsurface}
+\end{figure}
+
+\newpage
+
+\hypertarget{classification-des-individus}{%
+\subsection{Classification des individus}\label{classification-des-individus}}
+
+\hypertarget{div-train-test}{%
+\subsubsection{Méthode de choix des données train/test}\label{div-train-test}}
+
+En vue de l'apprentissage des nos algorithmes de machine learning pour la prédiction, il est essentiel d'utiliser une méthode qui va choisir les données d'apprentissage et les données de test.\\
+Ici nous divisons aléatoirement notre base en 2, le tableau ci-dessous décrit cette division.
+
+
+
+\begin{table}[H]
+
+\caption{\label{tab:tabletraintest}Répartition des observation en vue de l'apprentissage}
+\centering
+\begin{tabular}[t]{lrr}
+\toprule
+\textbf{Base} & \textbf{Nb\_obs} & \textbf{Pourcentage}\\
+\midrule
+\cellcolor{gray!6}{train} & \cellcolor{gray!6}{91599} & \cellcolor{gray!6}{70}\\
+test & 39258 & 30\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+\hypertarget{reg-log}{%
+\subsubsection{Méthode de régression logistique}\label{reg-log}}
+
+\begin{verbatim}
+[1] 0.3367084
+\end{verbatim}
+
+\begin{figure}[ht!]
+
+{\centering \includegraphics{Prediction_Gravite_files/figure-latex/confusionlog-1} 
+
+}
+
+\caption{Matrice de confusion représentant les résultats de la prédiction par régression logistique multinomiale.\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Lecture :} Le modèle prédictif donne 13474 bonnes prédiction pour la modalité ``Indemne.''}\label{fig:confusionlog}
+\end{figure}
+
+La méthode de régression logistique multinomiale donne une erreur de prédiction de 33.67\% déterminée par cross-validation.
+On représente la répartition des bonnes et mauvaises prédictions sur le graphe suivant.
+
+
+
+
+
+\newpage
+
+\hypertarget{xgboost}{%
+\subsubsection{Méthode XGBoost}\label{xgboost}}
+
+La méthode XGBoost otpimale donne un taux d'erreur de 0.35\%, on obtient donc un modèle prédictif donnant 0.65\% de bonnes prédictions. Pour que cette méthode soit optimale nous avons donné à notre algorithme les paramètres suivants :
+
+\begin{itemize}
+\tightlist
+\item
+  Profondeur maximale des arbres : 10\\
+\item
+  Nombre maximal d'itérations : 50.
+\end{itemize}
+
+On représente la répartition des bonnes et mauvaises prédictions sur le graphe suivant.
+
+\begin{figure}[ht!]
+
+{\centering \includegraphics{Prediction_Gravite_files/figure-latex/confusionxgb-1} 
+
+}
+
+\caption{Matrice de confusion représentant les résultats de la prédiction XGBoost\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Lecture :} Le modèle prédictif donne 11451 bonnes prédiction pour la modalité ``Indemne.''}\label{fig:confusionxgb}
+\end{figure}
+
+
+
+
+
+\newpage
+
+\hypertarget{random-forest}{%
+\subsubsection{Méthode Random Forest}\label{random-forest}}
+
+La méthode Random Forest donne un taux d'erreur de 0.32\%, on obtient dans un modèle prédictif donnant 0.68\% de bonnes prédictions. Pour que cette méthode soit optimale nous avons donné à notre algorithme les paramètres suivants :
+
+\begin{itemize}
+\tightlist
+\item
+  Nombre d'arbres : 100\\
+\item
+  Nombre de variables échantillonnées au hasard comme candidats à chaque coupure : 2.
+\end{itemize}
+
+On représente la répartition des bonnes et mauvaises prédictions sur le graphe suivant.
+
+\begin{figure}[ht!]
+
+{\centering \includegraphics{Prediction_Gravite_files/figure-latex/confusionrf-1} 
+
+}
+
+\caption{Matrice de confusion représentant les résultats de la prédiction Random Forest\\
+\textbf{Source des données :} Par les auteurs selon les données de 2019 du ministère de l'Intérieur.\\
+\textbf{Lecture :} Le modèle prédictif donne 13479 bonnes prédiction pour la modalité ``Indemne.''}\label{fig:confusionrf}
+\end{figure}
+
+
+
+
+
+\newpage
+
+\hypertarget{dico-var}{%
+\subsection{Dictionnaire des variables}\label{dico-var}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Base caractéristiques} :
+
+  \begin{itemize}
+  \item
+    Num\_acc : Numéro d'identifiant de l'accident
+  \item
+    Jour mois : Jour et mois de l'accident
+  \item
+    Hrmn : Heures et minutes de l'accident
+  \item
+    Lum : Conditions d'éclairage dans lesquelles l'accident s'est produit\\
+    1 -- Plein jour\\
+    2 -- Crépuscule ou aube\\
+    3 -- Nuit sans éclairage public\\
+    4 -- Nuit avec éclairage public non allumé\\
+    5 -- Nuit avec éclairage public allumé
+  \item
+    Com : Le numéro de commune est un code donné par l`INSEE. Le code est composé du code INSEE du département suivi par 3 chiffres
+  \item
+    Agg : Localisation de l'accident\\
+    1 -- Hors agglomération\\
+    2 -- En agglomération
+  \item
+    Int : Le type d'intersection où l'accident s'est déroulé\\
+    1 -- Hors intersection\\
+    2 -- Intersection en X\\
+    3 -- Intersection en T\\
+    4 -- Intersection en Y\\
+    5 -- Intersection à plus de 4 branches\\
+    6 -- Giratoire\\
+    7 -- Place\\
+    8 -- Passage à niveau\\
+    9 -- Autre intersection
+  \item
+    Atm : Le type de condition atmosphérique\\
+    -1 -- Non renseigné\\
+    1 -- Normale\\
+    2 -- Pluie légère\\
+    3 -- Pluie forte\\
+    4 -- Neige - Grêle\\
+    5 -- Brouillard - Fumée\\
+    6 -- Vent fort - Tempête\\
+    7 -- Temps éblouissant\\
+    8 -- Temps couvert\\
+    9 -- Couvert
+  \item
+    Col : Le type de collision\\
+    -1 -- Non renseigné
+    1 -- Deux véhicules - frontale\\
+    2 -- Deux véhicules - par l'arrière\\
+    3 -- Deux véhicules - par le côté\\
+    4 -- Trois véhicules et plus - en chaîne\\
+    5 -- Trois véhicules et plus - collisions multiples\\
+    6 -- Autre collision\\
+    7 -- Sans collision
+  \end{itemize}
+\item
+  \textbf{Base lieux} :
+
+  \begin{itemize}
+  \item
+    Catr : Catégorie de route\\
+    1 -- Autoroute\\
+    2 -- Route nationale\\
+    3 -- Route départementale\\
+    4 -- Voie communale\\
+    5 -- Hors réseau public\\
+    6 -- Parc de stationnement ouvert à la circulation publique\\
+    7 -- Routes de métropole urbaine\\
+    9 -- Autre
+  \item
+    Voie : Numéro de la route
+  \item
+    Circ : Régime de circulation\\
+    -1 -- Non renseigné\\
+    1 -- À sens unique\\
+    2 -- Bidirectionnelle\\
+    3 -- À chaussées séparées\\
+    4 -- Avec voies d'affectation variable
+  \item
+    Nbv : Nombre total de voies de circulation
+  \item
+    Vosp : Signale l'existence d'une voie réservée, indépendamment du fait que l'accident ait lieu ou non sur cette voie\\
+    -1 -- Non renseigné\\
+    0 -- Sans objet\\
+    1 -- Piste cyclable\\
+    2 -- Bande cyclable\\
+    3 -- Voie réservée
+  \item
+    Prof : Profil en long décrit la déclivité de la route à l'endroit de l'accident\\
+    -1 -- Non renseigné\\
+    1 -- Plat\\
+    2 -- Pente\\
+    3 -- Sommet de côte\\
+    4 -- Bas de côte
+  \item
+    Plan : Tracé en plan\\
+    -1 -- Non renseigné\\
+    1 -- Partie rectiligne\\
+    2 -- En courbe à gauche\\
+    3 -- En courbe à droite\\
+    4 -- En ``s''
+  \item
+    Larrout : Largeur de la chaussée affectée à la circulation des véhicules, ne sont pas compris les bandes d'arrêts d'urgences, les TPC et les places de stationnement (en m)
+  \item
+    Surf : État de la surface\\
+    -1 -- Non renseigné\\
+    1 -- Normale\\
+    2 -- Mouillée\\
+    3 -- Flaques\\
+    4 -- Inondée\\
+    5 -- Enneigée\\
+    6 -- Boue\\
+    7 -- Verglacée\\
+    8 -- Corps gras - huile\\
+    9 -- Autre
+  \item
+    Infra : Aménagement, infrastructure\\
+    -1 -- Non renseigné\\
+    0 -- Aucun\\
+    1 -- Souterrain - tunnel\\
+    2 -- Pont - autopont\\
+    3 -- Bretelle d'échangeru ou de raccordement\\
+    4 -- Voie ferrée\\
+    5 -- Carrefour aménagé\\
+    6 -- Zone piétonne\\
+    7 -- Zone de péage\\
+    8 -- Chantier\\
+    9 -- Autres
+  \item
+    Situ : Situation de l'accident\\
+    -1 -- Non renseigné\\
+    0 -- Aucun\\
+    1 -- Sur chaussée\\
+    2 -- Sur bandes d'arrêt d'urgence\\
+    3 -- Sur accotement\\
+    4 -- Sur trottoir\\
+    5 -- Sur piste cyclable\\
+    6 -- Sur autre voie spéciale\\
+    8 -- Autres
+  \item
+    VMA : Vitesse maximale autorisée sur le lieu et au moment de l'accident
+  \end{itemize}
+\item
+  \textbf{Base véhicule} :
+
+  \begin{itemize}
+  \item
+    Id\_vehicule : Identifiant unique du véhicule repris pour chacun des usagers occupant ce véhicule (y compris les piétons qui sont rattachés aux véhicules qui les ont heurtés) -- Code numérique
+  \item
+    Catv : Catégorie du véhicule :
+    00 -- Indéterminable\\
+    01 -- Bicyclette\\
+    02 -- Cyclomoteur \textless50cm3\\
+    03 -- Voiturette (Quadricycle à moteur carrossé) (anciennement ``voiturette ou tricycle à moteur'')\\
+    04 -- Référence inutilisée depuis 2006 (scooter immatriculé)\\
+    05 -- Référence inutilisée depuis 2006 (motocyclette)\\
+    06 -- Référence inutilisée depuis 2006 (side-car)\\
+    07 -- VL seul\\
+    08 -- Référence inutilisée depuis 2006 (VL + caravane)\\
+    09 -- Référence inutilisée depuis 2006 (VL + remorque)\\
+    10 -- VU seul 1,5T \textless= PTAC \textless= 3,5T avec ou sans remorque (anciennement VU seul 1,5T \textless= PTAC
+    \textless= 3,5T)\\
+    11 -- Référence inutilisée depuis 2006 (VU (10) + caravane)\\
+    12 -- Référence inutilisée depuis 2006 (VU (10) + remorque)\\
+    13 -- PL seul 3,5T \textless PTCA \textless= 7,5T\\
+    14 -- PL seul \textgreater{} 7,5T\\
+    15 -- PL \textgreater{} 3,5T + remorque\\
+    16 -- Tracteur routier seul\\
+    17 -- Tracteur routier + semi-remorque\\
+    18 -- Référence inutilisée depuis 2006 (transport en commun)\\
+    19 -- Référence inutilisée depuis 2006 (tramway)\\
+    20 -- Engin spécial\\
+    21 -- Tracteur agricole\\
+    30 -- Scooter \textless{} 50 cm3\\
+    31 -- Motocyclette \textgreater{} 50 cm3 et \textless= 125 cm3\\
+    32 -- Scooter \textgreater{} 50 cm3 et \textless= 125 cm3\\
+    33 -- Motocyclette \textgreater{} 125 cm3\\
+    34 -- Scooter \textgreater{} 125 cm3\\
+    35 -- Quad léger \textless= 50 cm3 (Quadricycle à moteur non carrossé)\\
+    36 -- Quad lourd \textgreater{} 50 cm3 (Quadricycle à moteur non carrossé)\\
+    37 -- Autobus\\
+    38 -- Autocar\\
+    39 -- Train\\
+    40 -- Tramway\\
+    41 -- 3RM \textless= 50 cm3\\
+    42 -- 3RM \textgreater{} 50 cm3 \textless= 125 cm3\\
+    43 -- 3RM \textgreater{} 125 cm3\\
+    50 -- EDP à moteur\\
+    60 -- EDP sans moteur 80 -- VAE\\
+    99 -- Autre véhicule
+  \item
+    Obs : Obstacle fixe heurté\\
+    -1 -- Non renseigné\\
+    0 -- Sans objet\\
+    1 -- Véhicule en stationnement\\
+    2 -- Arbre\\
+    3 -- Glissière métallique\\
+    4 -- Glissière béton\\
+    5 -- Autre glissière\\
+    6 -- Bâtiment, mur, pile de pont\\
+    7 -- Support de signalisation verticale ou poste d'appel d'urgence\\
+    8 -- Poteau\\
+    9 -- Mobilier urbain\\
+    10 -- Parapet\\
+    11 -- Ilot, refuge, borne haute\\
+    12 -- Bordure de trottoir\\
+    13 -- Fossé, talus, paroi rocheuse\\
+    14 -- Autre obstacle fixe sur chaussée\\
+    15 -- Autre obstacle fixe sur trottoir ou accotement\\
+    16 -- Sortie de chaussée sans obstacle\\
+    17 -- Buse -- tête d'aqueduc
+  \item
+    Obsm : Obstacle mobile heurté\\
+    -1 -- Non renseigné\\
+    0 -- Aucun\\
+    1 -- Piéton\\
+    2 -- Véhicule\\
+    4 -- Véhicule sur rail\\
+    5 -- Animal domestique\\
+    6 -- Animal sauvage\\
+    9 -- Autre
+  \item
+    Manv : Manoeuvre principale avant l'accident\\
+    -1 -- Non renseigné\\
+    0 -- Inconnue\\
+    1 -- Sans changement de direction\\
+    2 -- Même sens, même file\\
+    3 -- Entre 2 files\\
+    4 -- En marche arrière\\
+    5 -- A contresens\\
+    6 -- En franchissant le terre-plein central\\
+    7 -- Dans le couloir bus, dans le même sens\\
+    8 -- Dans le couloir bus, dans le sens inverse\\
+    9 -- En s'insérant
+    10 -- En faisant demi-tour sur la chaussée\\
+    \textbf{Changeant de file}\\
+    11 -- A gauche\\
+    12 -- A droite\\
+    \textbf{Déporté}\\
+    13 -- A gauche\\
+    14 -- A droite\\
+    \textbf{Tournant}\\
+    15 -- A gauche\\
+    16 -- A droite\\
+    \textbf{Dépassant}\\
+    17 -- A gauche\\
+    18 -- A droite\\
+    \textbf{Divers}\\
+    19 -- Traversant la chaussée\\
+    20 -- Manœuvre de stationnement\\
+    21 -- Manœuvre d'évitement\\
+    22 -- Ouverture de porte\\
+    23 -- Arrêté (hors stationnement)\\
+    24 -- En stationnement (avec occupants)\\
+    25 -- Circulant sur trottoir\\
+    26 -- Autres manœuvres
+  \item
+    Motor : Type de motorisation du véhicule\\
+    -1 -- Non renseigné\\
+    0 -- Inconnue\\
+    1 -- Hydrocarbures\\
+    2 -- Hybride électrique\\
+    3 -- Electrique\\
+    4 -- Hydrogène\\
+    5 -- Humaine\\
+    6 -- Autre
+  \end{itemize}
+\item
+  \textbf{Base usagers} :
+
+  \begin{itemize}
+  \item
+    Catu : Catégorie d'usager\\
+    1 -- Conducteur\\
+    2 -- Passager\\
+    3 -- Piéton
+  \item
+    Grav: Gravité de blessure de l'usager, les usagers accidentés sont classés en trois catégories de victimes plus les indemnes\\
+    1 -- Indemne\\
+    2 -- Tué\\
+    3 -- Blessé hospitalisé\\
+    4 -- Blessé léger
+  \item
+    Sexe : Sexe de l'usager\\
+    1 -- Masculin\\
+    2 -- Féminin
+  \item
+    An\_nais : Année de naissance de l'usager
+  \item
+    Trajet : Motif du déplacement au moment de l'accident\\
+    -1 -- Non renseigné\\
+    0 -- Non renseigné\\
+    1 -- Domicile -- travail\\
+    2 -- Domicile -- école\\
+    3 -- Courses -- achats\\
+    4 -- Utilisation professionnelle\\
+    5 -- Promenade -- loisirs\\
+    9 -- Autre
+  \item
+    Secu1 :
+    Le renseignement du caractère indique la présence et l'utilisation de l'équipement de sécurité\\
+    -1 -- Non renseigné\\
+    0 -- Aucun équipement\\
+    1 -- Ceinture\\
+    2 -- Casque\\
+    3 -- Dispositif enfants\\
+    4 -- Gilet réfléchissant\\
+    5 -- Airbag (2RM/3RM)\\
+    6 -- Gants (2RM/3RM)\\
+    7 -- Gants + Airbag (2RM/3RM)\\
+    8 -- Non déterminable\\
+    9 -- Autre
+  \item
+    Secu2 : Le renseignement du caractère indique la présence et l'utilisation de l'équipement de sécurité\\
+    -1 -- Non renseigné\\
+    0 -- Aucun équipement\\
+    1 -- Ceinture\\
+    2 -- Casque\\
+    3 -- Dispositif enfants\\
+    4 -- Gilet réfléchissant\\
+    5 -- Airbag (2RM/3RM)\\
+    6 -- Gants (2RM/3RM)\\
+    7 -- Gants + Airbag (2RM/3RM)\\
+    8 -- Non déterminable\\
+    9 -- Autre
+  \item
+    Secu3 : Le renseignement du caractère indique la présence et l'utilisation de l'équipement de sécurité\\
+    -1 -- Non renseigné\\
+    0 -- Aucun équipement\\
+    1 -- Ceinture\\
+    2 -- Casque\\
+    3 -- Dispositif enfants\\
+    4 -- Gilet réfléchissant\\
+    5 -- Airbag (2RM/3RM)\\
+    6 -- Gants (2RM/3RM)\\
+    7 -- Gants + Airbag (2RM/3RM)\\
+    8 -- Non déterminable\\
+    9 -- Autre
+  \item
+    Locp : Localisation du piéton\\
+    -1 -- Non renseigné\\
+    0 -- Sans objet\\
+    \textbf{Sur chaussée :}\\
+    1 -- A + 50 m du passage piéton\\
+    2 -- A -- 50 m du passage piéton\\
+    \textbf{Sur passage piéton :}\\
+    3 -- Sans signalisation lumineuse\\
+    4 -- Avec signalisation lumineuse\\
+    \textbf{Divers :}\\
+    5 -- Sur trottoir\\
+    6 -- Sur accotement\\
+    7 -- Sur refuge ou BAU\\
+    8 -- Sur contre allée\\
+    9 -- Inconnue
+  \item
+    Actp : Action du piéton\\
+    -1 -- Non renseigné\\
+    \textbf{Se déplaçant}\\
+    0 -- Non renseigné ou sans objet\\
+    1 -- Sens véhicule heurtant\\
+    2 -- Sens inverse du véhicule\\
+    \textbf{Divers}\\
+    3 -- Traversant\\
+    4 -- Masqué\\
+    5 -- Jouant -- courant\\
+    6 -- Avec animal\\
+    9 -- Autre\\
+    A -- Monte/descend du véhicule\\
+    B -- Inconnue
+  \item
+    Etatp : Cette variable permet de préciser si le piéton accidenté était seul ou non\\
+    -1 -- Non renseigné\\
+    1 -- Seul\\
+    2 -- Accompagné\\
+    3 -- En groupe
+  \end{itemize}
+\end{itemize}
+
+% %
+% %
+% %
+%
+% 
+%
+% 
+
+\end{document}

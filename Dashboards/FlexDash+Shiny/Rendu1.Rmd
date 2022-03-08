@@ -1,0 +1,259 @@
+---
+title: "Tout ce que vous avez toujours voulu savoir sur RBloggers"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    runtime: shiny
+    source_code: embed
+---
+
+```{r setup, include=FALSE}
+library("rmarkdown")
+library("flexdashboard")
+library("ggplot2")
+library("plotly")
+library("knitr")
+library("echarts4r")
+library("xml2")
+library("readr")
+library("lubridate")
+library("tidyverse")
+library("stringr")
+library("tidytext")
+library("shiny")
+
+setwd("~/ProjetsM2/Dashboards/FlexDash+Shiny")    # changez si besoin le répertoire de travail
+
+data_text <- read_delim("data_text.csv", 
+                        delim = "\t", escape_double = FALSE, 
+                        trim_ws = TRUE)    # décompressez la base de données si besoin et veillez à la copie dans le répertoire de travail
+
+# mot par auteur: autre solution ici
+# ou prendre le programme que j'ai déjà fait avec countwordV1 ou V1b
+# en novembre, ça marche aussi
+
+
+## TRANSFORMATION DU DATAFRAME: GESTION DES DATES de data_txt
+
+prev<- Sys.getlocale("LC_TIME") # pour éviter des ennuis de conversion pénibles   
+Sys.setlocale("LC_TIME", "C")   # on passe de "French_France.1252" à "C"
+
+data_text$date=strptime(data_text$date,format ="%B %d, %Y")
+
+Sys.setlocale("LC_TIME", prev)  # retour système local
+
+# j'ajoute les colonnes sans supprimer celle de la date formatée: les dataframes
+# sont un peu plus lourds mais ça passe!
+
+data_text%>%
+  mutate(
+    jour=wday(date,label = TRUE,abbr = FALSE ,week_start = "1",locale = Sys.getlocale("LC_TIME")),
+    mois=month(date,label=TRUE,abbr=FALSE,locale = Sys.getlocale("LC_TIME")),
+    annee=year(date)
+  )->data_text
+
+
+```
+
+
+```{r}
+
+ui1 = fluidPage(
+  
+  sidebarLayout(sidebarPanel(
+  
+              textInput("mot",label="Choix du mot/de l'expression", 
+              value = "data",width=NULL,
+              placeholder = "merci d'entrer un mot ou un groupe de mots "),width=3), 
+  
+  mainPanel(echarts4rOutput("anneeplot"))
+    
+  )   
+)
+
+ui2 = fluidPage(
+  
+  sidebarLayout(sidebarPanel(
+  
+              textInput("mot",label="Choix du mot/de l'expression", 
+              value = "data",width=NULL,
+              placeholder = "merci d'entrer un mot ou un groupe de mots "), 
+  
+              sliderInput("annee", label = "Choix de l'année",
+              min = 2008, max = 2021,value=2015 ,step = 1),width=3),
+  
+  mainPanel(echarts4rOutput("moisplot"))
+    
+))
+
+ui3 = fluidPage(
+  
+  sidebarLayout(sidebarPanel(selectizeInput("author", label = "Choix de l'auteur",
+              choices = unique(sort(data_text$author)), 
+              selected = "Antoine Guillot"),
+  
+              textInput("mot",label="Choix du mot/de l'expression", 
+              value = "data",width=NULL,
+              placeholder = "merci d'entrer un mot ou un groupe de mots "),width=3), 
+  
+  mainPanel(echarts4rOutput("authorplot"))
+  
+)
+)   
+
+```
+
+
+```{r}
+mycolor <- c("#2780e3","#003636","#a9a9a9", "#91c8c8")
+
+
+server <- function(input, output, session) {
+  output$anneeplot = renderEcharts4r({
+  data_text%>%
+      select(annee,text)%>%
+      group_by(annee)%>%
+      mutate(comptage=str_count(text,regex(paste("([:blank:]|[:punct:]|^)",input$mot,"([:blank:]|[:punct:])",sep=""),ignore_case = TRUE)))%>%
+      summarise(total=sum(comptage,na.rm=TRUE))%>%
+    
+      e_charts(annee) %>% 
+      e_bar(serie = total) %>% 
+      e_title(text = "Occurrences du mot par an", 
+            subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+      
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+      
+    e_x_axis(serie=annee,splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)) %>%
+      
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis")  %>% e_color(mycolor) })
+}
+
+shinyApp(ui = ui1, server = server)
+
+```
+
+
+
+```{r}
+mycolor <- c("#2780e3","#003636","#a9a9a9", "#91c8c8")
+
+server <- function(input, output, session) {
+  output$moisplot = renderEcharts4r({
+  data_text%>%
+    select(annee,mois,text)%>%
+    filter(annee==input$annee)%>%
+    group_by(mois)%>%
+    mutate(comptage=str_count(text,regex(paste("([:blank:]|[:punct:]|^)",input$mot,"([:blank:]|[:punct:])",sep=""),ignore_case = TRUE)))%>%
+    summarise(total=sum(comptage,na.rm=TRUE))%>%
+      mutate(mois=as.character(mois))%>%       
+      
+      # indispensable de le faire ici et pas dans le précédent mutate
+      # sinon on perd l'ordre des facteurs et les mois se retrouvent ds
+      # un ordre anarchique dans le graphique
+    
+      e_charts(mois) %>% 
+      e_bar(serie = total) %>% 
+      e_title(text = "Occurrences du mot par mois", 
+            subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+      
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+      
+    e_x_axis(splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)) %>%
+      
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis")  %>% e_color(mycolor) })
+
+
+}
+
+shinyApp(ui = ui2, server = server)  
+```
+
+
+```{r}
+mycolor <- c("#2780e3","#003636","#a9a9a9", "#91c8c8")
+
+server <- function(input, output, session) {
+  output$authorplot = renderEcharts4r({
+    data_text%>%
+    select(annee,author,text)%>%
+    filter(author==regex(input$author,ignore_case=TRUE))%>%
+    group_by(annee)%>%
+    mutate(comptage=str_count(text,regex(paste("([:blank:]|[:punct:]|^)",input$mot,"([:blank:]|[:punct:])",sep=""),ignore_case = TRUE)))%>%
+    summarise(total=sum(comptage,na.rm=TRUE))%>%
+    
+      e_charts(annee) %>% 
+      e_bar(serie = total) %>% 
+      e_title(text = "Occurrences d'un mot chez un auteur", 
+            subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+      
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+      
+    e_x_axis(serie=annee, splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0),
+             margin=1)%>%
+      
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis")  %>% e_color(mycolor) })
+}
+
+shinyApp(ui = ui3, server = server)
+```

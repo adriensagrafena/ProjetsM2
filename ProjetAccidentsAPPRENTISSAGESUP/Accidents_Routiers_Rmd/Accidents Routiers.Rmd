@@ -1,0 +1,544 @@
+---
+documentclass: "compterendu"
+lang: true
+babel-lang: "french"
+geometry:
+  - left=1.5cm
+  - right=1.5cm
+  - top=1.5cm
+  - bottom=2cm
+title: "Facteurs influençant la gravité des accidents corporels routiers"
+author: 
+  - Hugo CARLIN
+  - Valentine CROIBIEN
+  - Emilie PIERQUIN
+  - Adrien SAGRAFENA
+email:
+  - hugo.carlin@etudiant.univ-reims.fr
+  - valentine.croibien@etudiant.univ-reims.fr
+  - emilie.pierquin@etudiant.univ-reims.fr
+  - adrien.sagrafena@univ-reims.fr
+date: "`r format(Sys.time(), '%d %B %Y')`"
+anac: "2020-2021"
+diplome: "Master 2 - Statistique pour l'évaluation et la prévision"
+module: "SEP0953"
+enseig: "Morgan COUSIN"
+evaluation: "Compte-rendu d'analyse"
+output: 
+  bookdown::pdf_book:
+    template: template.tex
+    fig_caption: yes
+    keep_tex: yes
+    toc: yes
+---
+```{r, eval=TRUE, echo =FALSE, results=FALSE}
+# bibliotheques
+library('dplyr')
+
+
+########## MISE EN PLACE DE LA BASE
+### chargement de l'emplacement
+setwd("~/Documents/M2_SEP/SEMESTRE_1/SEP0953/GESTION_PROJET/PROJET/AccidentsRoutiers")
+
+### import des données
+carac <- read.csv2(file="data/caracteristiques-2019.csv")
+lieux <- read.csv2(file="data/lieux-2019.csv")
+usagers <- read.csv2(file="data/usagers-2019.csv")
+vehic <- read.csv2(file="data/vehicules-2019.csv")
+
+### création de la base finale
+# jointures
+carac_lieux <- inner_join(carac,lieux,by="Num_Acc")
+usagers_vehic <- inner_join(usagers,vehic,by="Num_Acc")
+df <- inner_join(carac_lieux,usagers_vehic,by="Num_Acc")
+# on garde les variables utiles
+var <- c("Num_Acc","jour","mois","hrmn","lum","com","agg","int","atm","col","catr","voie","circ","nbv","vosp","prof",
+         "plan","larrout","surf","infra","situ","vma","id_vehicule.x","catv","obs","obsm","manv","motor","catu","grav",
+         "sexe","an_nais","trajet","secu1","secu2","secu3","locp","actp","etatp")
+df <- df[,var]
+
+### formats variables
+summary(df)
+# numero accident
+df$Num_Acc <- as.factor(df$Num_Acc)
+# date
+df$date <- paste(df$jour,df$mois,"2019",sep="/")
+df$date <- as.Date(df$date,format="%d/%m/%Y")
+df <- df[,-c(2,3)]
+df <- relocate(df,"date",.after="Num_Acc")
+# heure 
+df$hrmn <- as.factor(df$hrmn)
+# lumiere
+df$lum <- as.factor(df$lum)
+# commune
+df$com <- as.factor(df$com)
+# agglomeration
+df$agg <- as.factor(df$agg)
+# intersection
+df$int <- as.factor(df$int)
+# météo
+df$atm <- as.factor(df$atm)
+# type de collision
+df$col <- as.factor(df$col)
+# categorie de route
+df$catr <- as.factor(df$catr)
+# regime de circulation
+df$circ <- as.factor(df$circ)
+# voie reservée
+df$vosp <- as.factor(df$vosp)
+# déclivité
+df$prof <- as.factor(df$prof)
+# virage
+df$plan <- as.factor(df$plan)
+# largeur de la route
+df$larrout <- as.double(df$larrout)
+# etat de la surface
+df$surf <- as.factor(df$surf)
+# infrastructures
+df$infra <- as.factor(df$infra)
+# situation de l'accident
+df$situ <- as.factor(df$situ)
+# id vehicule
+df$id_vehicule.x <- as.factor(df$id_vehicule.x)
+# catégorie du véhicule
+df$catv <- as.factor(df$catv)
+# obstacle fixe heurté
+df$obs <- as.factor(df$obs)
+# obstacle mobile heurté
+df$obsm <- as.factor(df$obsm)
+# manoeuvre avant l'accident
+df$manv <- as.factor(df$manv)
+# motorisation
+df$motor <- as.factor(df$motor)
+# catégorie de l'usager
+df$catu <- as.factor(df$catu)
+# gravité de l'accident
+df$grav <- as.factor(df$grav)
+# sexe
+df$sexe <- as.factor(df$sexe)
+# type de trajet
+df$trajet <- as.factor(df$trajet)
+# utilisation sécurité
+df$secu1 <- as.factor(df$secu1)
+df$secu2 <- as.factor(df$secu2)
+df$secu3 <- as.factor(df$secu3)
+# localisation du piéton
+df$locp <- as.factor(df$locp)
+# action du pieton
+df$actp <- as.factor(df$actp)
+# piéton seul ou non
+df$etatp <- as.factor(df$etatp)
+```
+
+
+
+
+
+# Introduction
+## Jeux de données utilisés 
+Les jeux de données utilisés sont disponibles sur [DataGouv](https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2019/). Ces jeux de données décrivent les accidents corporels routiers ayant eu lieu en 2019.  
+
+Nous disposons de quatre bases de données :  
+* Base caractéristiques : correspondant aux caractéristiques de l'accident  
+* Base lieux : correspondant aux caractéristiques du lieu de l'accident  
+* Base véhicule : correspondant aux caractéristiques du véhicule prenant part à l'accident  
+* Base usagers : correspondant aux caractéristiques des usagers faisant partie de l'accident   
+
+
+# Préparation des données 
+## Jointure des 4 bases  
+Nous réalisons des jointures entre les différentes bases sur l'identifiant de l'accident. Ainsi nous n'avons plus qu'une base à étudier et non quatre.  
+
+## Choix des variables  
+Cependant, en réalisant notre jointure, nous obtenons une base de données avec une multitude de variables.  
+Nous choisissons donc de réaliser un premier tri sur ces variables et gardons les variables suivantes :  
+
+* __Base caractéristiques__ :  
+  * Num_acc : Numéro d'identifiant de l'accident  
+  
+  * Jour mois : Jour et mois de l'accident  
+  
+  * Hrmn : Heures et minutes de l'accident  
+  
+  * Lum : Conditions d’éclairage dans lesquelles l'accident s'est produit   
+    1 – Plein jour  
+    2 – Crépuscule ou aube  
+    3 – Nuit sans éclairage public  
+    4 – Nuit avec éclairage public non allumé   
+    5 – Nuit avec éclairage public allumé  
+    
+  * Com :  Le numéro de commune est un code donné par l‘INSEE. Le code est composé du code INSEE du département suivi par 3 chiffres  
+  
+  * Agg : Localisation de l'accident   
+    1 – Hors agglomération   
+    2 – En agglomération  
+    
+  * Int : Le type d'intersection où l'accident s'est déroulé   
+    1 – Hors intersection  
+    2 – Intersection en X  
+    3 – Intersection en T  
+    4 – Intersection en Y  
+    5 – Intersection à plus de 4 branches  
+    6 – Giratoire  
+    7 – Place  
+    8 – Passage à niveau  
+    9 – Autre intersection  
+    
+  * Atm : Le type de condition atmosphérique   
+    -1 – Non renseigné  
+    1 – Normale  
+    2 – Pluie légère  
+    3 – Pluie forte  
+    4 – Neige - Grêle  
+    5 – Brouillard - Fumée  
+    6 – Vent fort - Tempête  
+    7 – Temps éblouissant  
+    8 – Temps couvert  
+    9 – Couvert  
+    
+  * Col : Le type de collision   
+    -1 – Non renseigné
+    1 – Deux véhicules - frontale  
+    2 – Deux véhicules - par l'arrière  
+    3 – Deux véhicules - par le côté  
+    4 – Trois véhicules et plus - en chaîne  
+    5 – Trois véhicules et plus - collisions multiples  
+    6 – Autre collision  
+    7 – Sans collision  
+
+* __Base lieux__ :  
+  * Catr : Catégorie de route   
+    1 – Autoroute  
+    2 – Route nationale  
+    3 – Route départementale  
+    4 – Voie communale  
+    5 – Hors réseau public  
+    6 – Parc de stationnement ouvert à la circulation publique  
+    7 – Routes de métropole urbaine  
+    9 – Autre  
+    
+  * Voie : Numéro de la route 
+  
+  * Circ : Régime de circulation  
+    -1 – Non renseigné  
+    1 – À sens unique  
+    2 – Bidirectionnelle  
+    3 – À chaussées séparées  
+    4 – Avec voies d'affectation variable  
+    
+  * Nbv : Nombre total de voies de circulation  
+  
+  * Vosp : Signale l'existence d'une voie réservée, indépendamment du fait que l'accident ait lieu ou non sur cette voie  
+    -1 – Non renseigné  
+    0 – Sans objet  
+    1 – Piste cyclable  
+    2 – Bande cyclable  
+    3 – Voie réservée  
+    
+  * Prof : Profil en long décrit la déclivité de la route à l'endroit de l'accident   
+    -1 – Non renseigné  
+    1 – Plat  
+    2 – Pente  
+    3 – Sommet de côte  
+    4 – Bas de côte  
+    
+  * Plan : Tracé en plan   
+    -1 – Non renseigné  
+    1 – Partie rectiligne  
+    2 – En courbe à gauche  
+    3 – En courbe à droite  
+    4 – En "s"  
+    
+  * Larrout : Largeur de la chaussée affectée à la circulation des véhicules, ne sont pas compris les bandes d'arrêts d'urgences, les TPC et les places de stationnement (en m)  
+  
+  * Surf : État de la surface   
+     -1 – Non renseigné  
+     1 – Normale  
+     2 – Mouillée  
+     3 – Flaques  
+     4 – Inondée  
+     5 – Enneigée  
+     6 – Boue  
+     7 – Verglacée  
+     8 – Corps gras - huile  
+     9 – Autre  
+     
+  * Infra : Aménagement, infrastructure  
+    -1 – Non renseigné  
+    0 – Aucun  
+    1 – Souterrain - tunnel  
+    2 – Pont - autopont  
+    3 – Bretelle d'échangeru ou de raccordement  
+    4 – Voie ferrée  
+    5 – Carrefour aménagé  
+    6 – Zone piétonne  
+    7 – Zone de péage  
+    8 – Chantier  
+    9 – Autres  
+    
+  * Situ : Situation de l'accident  
+    -1 – Non renseigné  
+    0 – Aucun  
+    1 – Sur chaussée  
+    2 – Sur bandes d'arrêt d'urgence  
+    3 – Sur accotement  
+    4 – Sur trottoir  
+    5 – Sur piste cyclable  
+    6 – Sur autre voie spéciale  
+    8 – Autres  
+    
+  * VMA : Vitesse maximale autorisée sur le lieu et au moment de l'accident  
+  
+* __Base véhicule__ :  
+  * Id_vehicule : Identifiant unique du véhicule repris pour chacun des usagers occupant ce véhicule (y compris les piétons qui sont rattachés aux véhicules qui les ont heurtés) – Code numérique  
+  
+  * Catv : Catégorie du véhicule :
+    00 – Indéterminable  
+    01 – Bicyclette  
+    02 – Cyclomoteur <50cm3  
+    03 – Voiturette (Quadricycle à moteur carrossé) (anciennement "voiturette ou tricycle à moteur")  
+  04 – Référence inutilisée depuis 2006 (scooter immatriculé)  
+    05 – Référence inutilisée depuis 2006 (motocyclette)  
+    06 – Référence inutilisée depuis 2006 (side-car)  
+    07 – VL seul  
+    08 – Référence inutilisée depuis 2006 (VL + caravane)       
+    09 – Référence inutilisée depuis 2006 (VL + remorque)       
+    10 – VU seul 1,5T <= PTAC <= 3,5T avec ou sans remorque (anciennement VU seul 1,5T <= PTAC
+<= 3,5T)  
+    11 – Référence inutilisée depuis 2006 (VU (10) + caravane)  
+    12 – Référence inutilisée depuis 2006 (VU (10) + remorque)  
+    13 – PL seul 3,5T <PTCA <= 7,5T  
+    14 – PL seul > 7,5T  
+    15 – PL > 3,5T + remorque  
+    16 – Tracteur routier seul  
+    17 – Tracteur routier + semi-remorque  
+    18 – Référence inutilisée depuis 2006 (transport en commun)  
+    19 – Référence inutilisée depuis 2006 (tramway)  
+    20 – Engin spécial  
+    21 – Tracteur agricole  
+    30 – Scooter < 50 cm3  
+    31 – Motocyclette > 50 cm3 et <= 125 cm3  
+    32 – Scooter > 50 cm3 et <= 125 cm3  
+    33 – Motocyclette > 125 cm3  
+    34 – Scooter > 125 cm3  
+    35 – Quad léger <= 50 cm3 (Quadricycle à moteur non carrossé)  
+    36 – Quad lourd > 50 cm3 (Quadricycle à moteur non carrossé)  
+    37 – Autobus  
+    38 – Autocar  
+    39 – Train  
+    40 – Tramway  
+    41 – 3RM <= 50 cm3  
+    42 – 3RM > 50 cm3 <= 125 cm3  
+    43 – 3RM > 125 cm3  
+    50 – EDP à moteur  
+    60 – EDP sans moteur 80 – VAE  
+    99 – Autre véhicule  
+    
+  * Obs : Obstacle fixe heurté  
+    -1 – Non renseigné  
+    0 – Sans objet  
+    1 – Véhicule en stationnement  
+    2 – Arbre  
+    3 – Glissière métallique  
+    4 – Glissière béton  
+    5 – Autre glissière  
+    6 – Bâtiment, mur, pile de pont  
+    7 – Support de signalisation verticale ou poste d’appel d’urgence  
+    8 – Poteau  
+    9 – Mobilier urbain  
+    10 – Parapet  
+    11 – Ilot, refuge, borne haute  
+    12 – Bordure de trottoir  
+    13 – Fossé, talus, paroi rocheuse  
+    14 – Autre obstacle fixe sur chaussée  
+    15 – Autre obstacle fixe sur trottoir ou accotement  
+    16 – Sortie de chaussée sans obstacle  
+    17 – Buse – tête d’aqueduc  
+    
+  * Obsm : Obstacle mobile heurté  
+    -1 – Non renseigné  
+    0 – Aucun  
+    1 – Piéton  
+    2 – Véhicule  
+    4 – Véhicule sur rail  
+    5 – Animal domestique  
+    6 – Animal sauvage  
+    9 – Autre  
+
+  * Manv : Manoeuvre principale avant l’accident  
+    -1 – Non renseigné  
+    0 – Inconnue  
+    1 – Sans changement de direction  
+    2 – Même sens, même file  
+    3 – Entre 2 files  
+    4 – En marche arrière  
+    5 – A contresens  
+    6 – En franchissant le terre-plein central  
+    7 – Dans le couloir bus, dans le même sens  
+    8 – Dans le couloir bus, dans le sens inverse  
+    9 – En s’insérant
+    10 – En faisant demi-tour sur la chaussée  
+    **Changeant de file**  
+    11 – A gauche  
+    12 – A droite  
+    **Déporté**  
+    13 – A gauche  
+    14 – A droite  
+    **Tournant**  
+    15 – A gauche  
+    16 – A droite  
+    **Dépassant**  
+    17 – A gauche  
+    18 – A droite  
+    **Divers**  
+    19 – Traversant la chaussée  
+    20 – Manœuvre de stationnement  
+    21 – Manœuvre d’évitement  
+    22 – Ouverture de porte  
+    23 – Arrêté (hors stationnement)  
+    24 – En stationnement (avec occupants)  
+    25 – Circulant sur trottoir  
+    26 – Autres manœuvres  
+    
+  * Motor : Type de motorisation du véhicule  
+    -1 – Non renseigné  
+    0 – Inconnue  
+    1 – Hydrocarbures  
+    2 – Hybride électrique  
+    3 – Electrique  
+    4 – Hydrogène  
+    5 – Humaine  
+    6 – Autre   
+    
+* __Base usagers__ :  
+  * Catu : Catégorie d'usager  
+    1 – Conducteur  
+    2 – Passager  
+    3 – Piéton  
+    
+  * Grav: Gravité de blessure de l'usager, les usagers accidentés sont classés en trois catégories de victimes plus les indemnes  
+    1 – Indemne  
+    2 – Tué  
+    3 – Blessé hospitalisé  
+    4 – Blessé léger  
+    
+  * Sexe : Sexe de l'usager  
+    1 – Masculin  
+    2 – Féminin  
+    
+  * An_nais : Année de naissance de l'usager  
+  
+  * Trajet : Motif du déplacement au moment de l’accident  
+    -1 – Non renseigné   
+    0 – Non renseigné  
+    1 – Domicile – travail  
+    2 – Domicile – école  
+    3 – Courses – achats  
+    4 – Utilisation professionnelle  
+    5 – Promenade – loisirs  
+    9 – Autre  
+    
+  * Secu1 : 
+Le renseignement du caractère indique la présence et l’utilisation de l’équipement de sécurité  
+    -1 – Non renseigné  
+    0 – Aucun équipement  
+    1 – Ceinture  
+    2 – Casque  
+    3 – Dispositif enfants  
+    4 – Gilet réfléchissant  
+    5 – Airbag (2RM/3RM)  
+    6 – Gants (2RM/3RM)  
+    7 – Gants + Airbag (2RM/3RM)  
+    8 – Non déterminable  
+    9 – Autre  
+    
+  * Secu2 : Le renseignement du caractère indique la présence et l’utilisation de l’équipement de sécurité  
+    -1 – Non renseigné  
+    0 – Aucun équipement  
+    1 – Ceinture  
+    2 – Casque  
+    3 – Dispositif enfants  
+    4 – Gilet réfléchissant  
+    5 – Airbag (2RM/3RM)  
+    6 – Gants (2RM/3RM)  
+    7 – Gants + Airbag (2RM/3RM)  
+    8 – Non déterminable  
+    9 – Autre  
+    
+  * Secu3 : Le renseignement du caractère indique la présence et l’utilisation de l’équipement de sécurité  
+    -1 – Non renseigné  
+    0 – Aucun équipement  
+    1 – Ceinture  
+    2 – Casque  
+    3 – Dispositif enfants  
+    4 – Gilet réfléchissant  
+    5 – Airbag (2RM/3RM)  
+    6 – Gants (2RM/3RM)  
+    7 – Gants + Airbag (2RM/3RM)  
+    8 – Non déterminable  
+    9 – Autre  
+    
+  * Locp : Localisation du piéton  
+    -1 – Non renseigné   
+    0 – Sans objet  
+    **Sur chaussée :**  
+    1 – A + 50 m du passage piéton  
+    2 – A – 50 m du passage piéton  
+    **Sur passage piéton :**  
+    3 – Sans signalisation lumineuse    
+    4 – Avec signalisation lumineuse  
+    **Divers :**  
+    5 – Sur trottoir  
+    6 – Sur accotement  
+    7 – Sur refuge ou BAU  
+    8 – Sur contre allée  
+    9 – Inconnue  
+    
+  * Actp : Action du piéton  
+    -1 – Non renseigné  
+    **Se déplaçant**  
+    0 – Non renseigné ou sans objet   
+    1 – Sens véhicule heurtant  
+    2 – Sens inverse du véhicule  
+    **Divers**  
+    3 – Traversant  
+    4 – Masqué  
+    5 – Jouant – courant  
+    6 – Avec animal  
+    9 – Autre  
+    A – Monte/descend du véhicule  
+    B – Inconnue  
+    
+  * Etatp : Cette variable permet de préciser si le piéton accidenté était seul ou non  
+    -1 – Non renseigné  
+    1 – Seul  
+    2 – Accompagné  
+    3 – En groupe
+  
+## Valeurs manquantes  
+```{r, eval =TRUE}
+is.na(df$date)
+is.na(df$hrmn)
+is.na(df$lum)
+is.na()
+```
+
+
+
+# Statistiques descriptives
+## Base caractéristiques  
+## Base lieux  
+## Base véhicule  
+## Base usagers  
+
+```{r, echo = FALSE}
+#Ce bloc configure quelques options d'affichage pour les blocs R
+library('knitr')
+opts_chunk$set(comment = '', echo = FALSE,  tidy = TRUE, 
+               fig.pos = 'ht!', fig.align='center', fig.width= 4.5, fig.height = 3.2)
+```
+
+# (APPENDIX) Annexes {-}
+
+# Annexes
+

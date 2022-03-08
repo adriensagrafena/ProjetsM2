@@ -1,0 +1,699 @@
+---
+title: "Tout ce que vous avez toujours voulu savoir sur RBloggers"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library("rmarkdown")
+library("flexdashboard")
+library("plotly")
+library("knitr")
+library("echarts4r")
+library("xml2")
+library("readr")
+library("lubridate")
+library("tidyverse")
+library("stringr")
+library("tidytext")
+library("shiny")
+library("DT")
+library("tidyverse")
+
+
+data_text <- read_delim("data/data_text.csv", 
+                        delim = "\t", escape_double = FALSE, 
+                        trim_ws = TRUE)
+
+
+data <- read_delim("data/data.csv",
+                   delim = ",",
+                   escape_double = FALSE, trim_ws = TRUE)
+
+
+Sys.setlocale("LC_TIME", "C")
+
+data_text$date=strptime(data_text$date,format ="%B %d, %Y")
+data$date=strptime(data$date,format ="%B %d, %Y")
+
+Sys.setlocale("LC_TIME", "fr_FR.UTF-8")
+
+data_text%>%
+  mutate(
+    jour=wday(date,label = TRUE,abbr = FALSE ,week_start = "1",locale = Sys.getlocale("LC_TIME")),
+    mois=month(date,label=TRUE,abbr=FALSE,locale = Sys.getlocale("LC_TIME")),
+    annee=year(date)
+  )->data_text
+
+
+
+data%>%
+  mutate(
+    jour=wday(date,label = TRUE,abbr = FALSE ,week_start = "1",locale = Sys.getlocale("LC_TIME")),
+    mois=month(date,label=TRUE,abbr=FALSE,locale = Sys.getlocale("LC_TIME")),
+    annee=year(date)
+  )->data
+
+mycolor <- c("#2780e3","#003636","#a9a9a9", "#91c8c8")
+
+```
+
+
+Accueil
+=====================================
+
+Row {data-height=100}
+-----------------------------------------------------------------------
+### Nombre de bloggers
+```{r}
+flexdashboard::valueBox(length(unique(data_text$author)), icon = "fa-user", color = "primary")
+```
+
+### Nombre de publications
+```{r}
+flexdashboard::valueBox(nrow(data_text), icon = "fa-newspaper", color = "primary")
+```
+
+### Likes sur Facebook
+```{r}
+flexdashboard::valueBox("80023", icon = "fa-facebook", color = "primary")
+```
+
+### Abonné Twitter
+```{r}
+flexdashboard::valueBox("96438", icon = "fa-twitter", color = "primary")
+```
+
+
+Row {data-width=600}
+-----------------------------------------------------------------------
+
+### Trend de publication des articles
+
+```{r}
+data %>% 
+  mutate(annee=factor(annee))%>%
+  mutate(mois = as.character(mois)) %>%
+  group_by(annee, mois) %>%
+  summarize(Nbarticles = n()) %>%
+  arrange(match(mois, c("janvier", "février", "mars", 
+                        "avril", "mai",  "juin", 
+                        "juillet", "août","septembre", 
+                        "octobre","novembre", "décembre"))) %>%
+  e_charts(mois,timeline = TRUE) %>% 
+  e_line(Nbarticles, name ="Nombre d'articles") %>%
+    e_title(
+            subtext = "Chronologie", 
+            sublink = "#",
+          left = "left", top = 4
+    ) %>%
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+    e_x_axis(splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)
+             ) %>%
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis") %>% e_color(mycolor)
+```
+
+###  Nombre d'articles publiés par an 
+
+```{r}
+data %>% group_by(annee) %>% 
+    mutate(annee=as.factor(annee))%>%
+    summarize(Nbarticles=n())%>%
+    e_charts(annee) %>% 
+    e_line(serie = Nbarticles, name ="Nombre d'articles") %>% 
+    e_title(subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+    e_x_axis(splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)) %>%
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis") %>% e_color(mycolor)
+```
+
+Row {data-width=600}
+-----------------------------------------------------------------------
+
+### Nombre d'articles publiés par mois de l'année
+
+```{r}
+data %>% group_by(mois) %>% 
+    summarize(Nbarticles=n())%>%
+    mutate(mois=as.character(mois))%>%
+    e_charts(mois) %>% 
+    e_bar(serie = Nbarticles, name ="Nombre d'articles") %>% 
+    e_title(subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+    e_x_axis(splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)) %>%
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis") %>% e_color(mycolor)
+```
+
+### Nombre d'articles publiés par jour de la semaine
+
+```{r}
+data %>% group_by(jour) %>% 
+    summarize(Nbarticles=n())%>%
+    mutate(jour=as.character(jour))%>%
+    e_charts(jour) %>% 
+    e_bar(serie = Nbarticles, name ="Nombre d'articles") %>% 
+    e_title(subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+    e_x_axis(splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)) %>%
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis") %>% e_color(mycolor)
+```
+
+Bloggers
+=====================================
+
+Row {data-height=500}
+-----------------------------------------------------------------------
+
+### Articles publié par auteur
+
+```{r}
+server <- function(input, output, session) {
+  output$authortitles = renderDT({data%>%
+  select(author, title) %>%
+  filter(author == input$author) %>%
+  select(title)})
+  }
+
+ui_1 = fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectInput("author",
+              label = "Nom de l'auteur",
+              choices = unique(data$author), selected = "dgrapov"
+              )),
+  mainPanel(DTOutput("authortitles") )
+    
+  )   
+)
+
+shinyApp(ui = ui_1, server = server)
+```
+
+Row {data-height=400}
+-----------------------------------------------------------------------
+
+### Nombre de publications par an
+```{r}
+server <- function(input, output, session) {
+  output$authorplotyear = renderEcharts4r({data%>%
+    mutate(annee = as.character(annee)) %>%
+    filter(author == input$author) %>%
+    group_by(author, annee) %>%
+    summarize(Nbarticles=n())%>%
+    e_charts(annee) %>% 
+    e_line(serie = Nbarticles) %>% 
+    e_title(text = "Nombre d'articles publiés par an", 
+            subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+    e_x_axis(splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)) %>%
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis")  %>% e_color(mycolor) })
+}
+
+ui_2 = fluidPage(
+  sidebarLayout(sidebarPanel(
+  selectInput("author",
+              label = "Auteur",
+              choices = unique(data$author), selected = "dgrapov"
+              )
+  ),
+  mainPanel(echarts4rOutput("authorplotyear"))
+    
+  )   
+)
+      
+shinyApp(ui = ui_2, server = server)
+```
+
+
+Row {data-height=500}
+-----------------------------------------------------------------------
+### Thématiques par auteur
+```{r}
+
+server <- function(input, output, session) {
+  output$authorplotyear = renderEcharts4r({data%>%
+    mutate(annee = as.character(annee)) %>%
+    filter(author == input$author) %>%
+    group_by(cluster) %>%
+    summarize(n =n())%>%
+    mutate(freq =n / sum(n)) %>%
+    e_charts(cluster) %>% 
+    e_bar(serie = freq, name = "Nombre d'articles") %>% 
+    e_title(text = "Thématiques par auteur", 
+            subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+    e_x_axis(splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)) %>%
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis")  %>% e_color(mycolor) })
+}
+
+ui_3 = fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectInput("author",
+              label = "Auteur",
+              choices = unique(data$author), selected = "dgrapov"
+              )),
+  mainPanel(echarts4rOutput("authorplotyear"))
+    
+  )   
+)
+
+shinyApp(ui = ui_3, server = server)
+
+```
+
+
+Keywords
+===================================== 
+
+
+```{r}
+
+ui1 = fluidPage(
+  
+  sidebarLayout(sidebarPanel(
+  
+              textInput("mot",label="Choix du mot/de l'expression", 
+              value = "data",width=NULL,
+              placeholder = "merci d'entrer un mot ou un groupe de mots "),width=3), 
+  
+  mainPanel(echarts4rOutput("anneeplot"))
+    
+  )   
+)
+
+ui2 = fluidPage(
+  
+  sidebarLayout(sidebarPanel(
+  
+              textInput("mot",label="Choix du mot/de l'expression", 
+              value = "data",width=NULL,
+              placeholder = "merci d'entrer un mot ou un groupe de mots "), 
+  
+              sliderInput("annee", label = "Choix de l'année",
+              min = 2008, max = 2021,value=2015 ,step = 1),width=3),
+  
+  mainPanel(echarts4rOutput("moisplot"))
+    
+))
+
+ui3 = fluidPage(
+  
+  sidebarLayout(sidebarPanel(selectizeInput("author", label = "Choix de l'auteur",
+              choices = unique(sort(data_text$author)), 
+              selected = "Antoine Guillot"),
+  
+              textInput("mot",label="Choix du mot/de l'expression", 
+              value = "data",width=NULL,
+              placeholder = "merci d'entrer un mot ou un groupe de mots "),width=3), 
+  
+  mainPanel(echarts4rOutput("authorplot"))
+  
+)
+)   
+
+```
+
+
+```{r}
+mycolor <- c("#2780e3","#003636","#a9a9a9", "#91c8c8")
+
+
+server <- function(input, output, session) {
+  output$anneeplot = renderEcharts4r({
+  data_text%>%
+      select(annee,text)%>%
+      group_by(annee)%>%
+      mutate(comptage=str_count(text,regex(paste("([:blank:]|[:punct:]|^)",input$mot,"([:blank:]|[:punct:])",sep=""),ignore_case = TRUE)))%>%
+      summarise(total=sum(comptage,na.rm=TRUE))%>%
+    
+      e_charts(annee) %>% 
+      e_line(serie = total) %>% 
+      e_title(text = "Occurrences du mot par an", 
+            subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+      
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+      
+    e_x_axis(serie=annee,splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)) %>%
+      
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis")  %>% e_color(mycolor) })
+}
+
+shinyApp(ui = ui1, server = server)
+
+```
+
+
+
+```{r}
+mycolor <- c("#2780e3","#003636","#a9a9a9", "#91c8c8")
+
+server <- function(input, output, session) {
+  output$moisplot = renderEcharts4r({
+  data_text%>%
+    select(annee,mois,text)%>%
+    filter(annee==input$annee)%>%
+    group_by(mois)%>%
+    mutate(comptage=str_count(text,regex(paste("([:blank:]|[:punct:]|^)",input$mot,"([:blank:]|[:punct:])",sep=""),ignore_case = TRUE)))%>%
+    summarise(total=sum(comptage,na.rm=TRUE))%>%
+      mutate(mois=as.character(mois))%>%       
+      
+      # indispensable de le faire ici et pas dans le précédent mutate
+      # sinon on perd l'ordre des facteurs et les mois se retrouvent ds
+      # un ordre anarchique dans le graphique
+    
+      e_charts(mois) %>% 
+      e_line(serie = total) %>% 
+      e_title(text = "Occurrences du mot par mois", 
+            subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+      
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+      
+    e_x_axis(splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)) %>%
+      
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis")  %>% e_color(mycolor) })
+
+
+}
+
+shinyApp(ui = ui2, server = server)  
+```
+
+
+```{r}
+mycolor <- c("#2780e3","#003636","#a9a9a9", "#91c8c8")
+
+server <- function(input, output, session) {
+  output$authorplot = renderEcharts4r({
+    data_text%>%
+    select(annee,author,text)%>%
+    filter(author==regex(input$author,ignore_case=TRUE))%>%
+    group_by(annee)%>%
+    mutate(comptage=str_count(text,regex(paste("([:blank:]|[:punct:]|^)",input$mot,"([:blank:]|[:punct:])",sep=""),ignore_case = TRUE)))%>%
+    summarise(total=sum(comptage,na.rm=TRUE))%>%
+    
+      e_charts(annee) %>% 
+      e_bar(serie = total) %>% 
+      e_title(text = "Occurrences d'un mot chez un auteur", 
+            subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+      
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+      
+    e_x_axis(serie=annee, splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0),
+             margin=1)%>%
+      
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis")  %>% e_color(mycolor) })
+}
+
+shinyApp(ui = ui3, server = server)
+```
+
+
+
+
+Topics
+===================================== 
+
+Row {data-height=500}
+-----------------------------------------------------------------------
+### Evolution des thématiques
+```{r}
+
+server <- function(input, output, session) {
+  output$clusteryear = renderEcharts4r({data%>%
+    mutate(annee = as.character(annee)) %>%
+    filter(cluster == input$cluster) %>%
+    group_by(cluster,annee) %>%
+    summarize(ncount =n())%>%
+    e_charts(annee) %>% 
+    e_line(serie = ncount) %>% 
+    e_title(text = "Thématiques", 
+            subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+    e_x_axis(splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)) %>%
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis")  %>% e_color(mycolor) })
+}
+
+ui_4 = fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectInput("cluster",
+              label = "Thématique",
+              choices = unique(data$cluster)
+              )),
+  mainPanel(echarts4rOutput("clusteryear"))
+    
+  )   
+)
+      
+
+shinyApp(ui = ui_4, server = server)
+```
+
+Row {data-height=700}
+-----------------------------------------------------------------------
+### Les 30 thématiques les plus abordées
+
+```{r}
+
+data%>%
+  filter(cluster != "Empty texts") %>%
+    group_by(cluster) %>%
+    summarize(ncount =n())%>%
+    arrange(ncount) %>%
+    tail(30) %>%
+    e_charts(cluster) %>% 
+    e_bar(serie = ncount , name = "Nombre d'articles") %>% 
+    e_title(text = "Thématiques", 
+            subtext = "Quantité", 
+            sublink = "#",
+            left = "left", top = 4
+    ) %>%
+    e_y_axis(
+      splitArea = list(show = TRUE),
+      axisPointer = list(      show = FALSE, 
+                               lineStyle = list(
+                                 color = "#999999",
+                                 width = 0.75,
+                                 type = "dotted"
+                               ))
+    ) %>%
+    e_x_axis(splitArea = list(show = TRUE),
+             splitLine = list(show = TRUE),
+             axisLabel= list(rotate = 30,interval = 0)) %>%
+    e_toolbox_feature(feature = "magicType",
+                      type = list("area", "line", "bar")) %>%
+    e_toolbox_feature("restore") %>%
+    e_toolbox_feature(feature = "reset") %>%
+    e_toolbox_feature("dataView") %>%
+    e_toolbox_feature("saveAsImage") %>%
+    e_animation(duration = 1000) %>%
+    e_tooltip(trigger = "axis")  %>% e_color(mycolor) %>% e_flip_coords()
+
+```
+
+
+
+
+
+
+
+
+
